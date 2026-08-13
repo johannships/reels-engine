@@ -1,0 +1,9 @@
+[build]
+builder = "dockerfile"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+startCommand = "python3 pipeline/worker.py"
+restartPolicyType = "always"
+# Attach a volume in the Railway dashboard mounted at /data
+# and set the env vars listed in deploy/RAILWAY.md.

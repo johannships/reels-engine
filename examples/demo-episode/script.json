@@ -1,0 +1,39 @@
+{
+ "date": "2026-08-01",
+ "scenes": [
+  {
+   "type": "intro",
+   "durationSec": 5,
+   "line1": "MICROSOFT'S AI COURSE",
+   "line2": "NOW 100% FREE",
+   "logo": "microsoft",
+   "text": "Don't spend five grand on an AI bootcamp, because Microsoft just made a full twelve week course completely free."
+  },
+  {
+   "type": "repo",
+   "durationSec": 10,
+   "repo": "microsoft/AI-For-Beginners",
+   "stars": 57603,
+   "today": 1592,
+   "desc": "12 Weeks, 24 Lessons, AI for All!",
+   "text": "So this is AI For Beginners. Twenty four lessons that take you from zero to building real neural networks. Fifty seven thousand stars on GitHub, and Microsoft charges nothing."
+  },
+  {
+   "type": "kinetic",
+   "durationSec": 8,
+   "keyText": "FUNDAMENTALS ARE FREE NOW",
+   "text": "So here's the truth. The fundamentals are free now. What people pay for is implementation. Learn this, then build the things clients actually pay for."
+  },
+  {
+   "type": "cta",
+   "durationSec": 7,
+   "text": "I made a free AI starter path to go with it. Comment LEARN and I'll DM you both.",
+   "badge": "@yourhandle"
+  }
+ ],
+ "social": {
+  "title": "Microsoft Made Its AI Course 100% Free",
+  "caption": "Microsoft's AI For Beginners is a full 12-week course and it's free on GitHub.\n\nComment LEARN and I'll DM you the link.\n#microsoft #ai #free"
+ },
+ "layout": "split"
+}

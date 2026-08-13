@@ -1,0 +1,13 @@
+{
+ "date": "2026-08-01",
+ "mode": "breakout",
+ "picks": [
+  {
+   "repo": "microsoft/AI-For-Beginners",
+   "stars": 57603,
+   "desc": "12 Weeks, 24 Lessons, AI for All!",
+   "url": "https://github.com/microsoft/AI-For-Beginners",
+   "today": 1592
+  }
+ ]
+}

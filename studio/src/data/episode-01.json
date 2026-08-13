@@ -1,0 +1,42 @@
+{
+  "date": "2026-07-04",
+  "scenes": [
+    {
+      "type": "intro",
+      "durationSec": 4,
+      "text": "Three AI repos are blowing up on GitHub today. Number two is basically a business in a box."
+    },
+    {
+      "type": "repo",
+      "durationSec": 12,
+      "repo": "usestrix/strix",
+      "stars": 35615,
+      "today": 1910,
+      "desc": "Open-source AI penetration testing agent that finds and fixes your app's vulnerabilities",
+      "text": "First, Strix. An open source AI agent that hacks your own app before someone else does. It finds the vulnerabilities, then fixes them. Nineteen hundred stars today alone. Agencies charge five grand for the audit this thing runs overnight."
+    },
+    {
+      "type": "repo",
+      "durationSec": 12,
+      "repo": "alibaba/page-agent",
+      "stars": 22814,
+      "today": 1110,
+      "desc": "In-page GUI agent. Control web interfaces with natural language",
+      "text": "Second, Alibaba just dropped Page Agent. One script tag, and any website becomes something you control in plain English. Client onboarding, form filling, demos. That's a service you can sell tomorrow."
+    },
+    {
+      "type": "repo",
+      "durationSec": 12,
+      "repo": "Zackriya-Solutions/meetily",
+      "stars": 14653,
+      "today": 607,
+      "desc": "Privacy-first AI meeting assistant that runs entirely on your machine",
+      "text": "Third, Meetily. An AI meeting notetaker that runs fully on your own machine. No cloud. Law firms and banks can't use the popular notetakers. They can use this. Fourteen thousand stars and climbing."
+    },
+    {
+      "type": "cta",
+      "durationSec": 5,
+      "text": "I post the three hottest AI repos every day. Follow so you don't miss tomorrow's."
+    }
+  ]
+}

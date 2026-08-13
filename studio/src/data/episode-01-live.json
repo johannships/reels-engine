@@ -1,0 +1,1018 @@
+{
+ "date": "2026-07-04",
+ "scenes": [
+  {
+   "type": "intro",
+   "durationSec": 4.93,
+   "text": "Three AI repos are blowing up on GitHub today. Number two is basically a business in a box."
+  },
+  {
+   "type": "repo",
+   "durationSec": 17.01,
+   "repo": "usestrix/strix",
+   "stars": 35615,
+   "today": 1910,
+   "desc": "Open-source AI penetration testing agent that finds and fixes your app's vulnerabilities",
+   "text": "First, Strix. An open source AI agent that hacks your own app before someone else does. It finds the vulnerabilities, then fixes them. Nineteen hundred stars today alone. Agencies charge five grand for the audit this thing runs overnight."
+  },
+  {
+   "type": "repo",
+   "durationSec": 15.07,
+   "repo": "alibaba/page-agent",
+   "stars": 22814,
+   "today": 1110,
+   "desc": "In-page GUI agent. Control web interfaces with natural language",
+   "text": "Second, Alibaba just dropped Page Agent. One script tag, and any website becomes something you control in plain English. Client onboarding, form filling, demos. That's a service you can sell tomorrow."
+  },
+  {
+   "type": "repo",
+   "durationSec": 16.24,
+   "repo": "Zackriya-Solutions/meetily",
+   "stars": 14653,
+   "today": 607,
+   "desc": "Privacy-first AI meeting assistant that runs entirely on your machine",
+   "text": "Third, Meetily. An AI meeting notetaker that runs fully on your own machine. No cloud. Law firms and banks can't use the popular notetakers. They can use this. Fourteen thousand stars and climbing."
+  },
+  {
+   "type": "cta",
+   "durationSec": 3.5,
+   "text": "I post the three hottest AI repos every day. Follow so you don't miss tomorrow's."
+  }
+ ],
+ "avatarW": 1080,
+ "avatarH": 1920,
+ "avatarFocusY": 0.45,
+ "captions": [
+  {
+   "word": "three",
+   "startMs": 190,
+   "endMs": 340
+  },
+  {
+   "word": "AI",
+   "startMs": 340,
+   "endMs": 470
+  },
+  {
+   "word": "repos",
+   "startMs": 470,
+   "endMs": 800
+  },
+  {
+   "word": "are",
+   "startMs": 800,
+   "endMs": 1000
+  },
+  {
+   "word": "blowing",
+   "startMs": 1000,
+   "endMs": 1470
+  },
+  {
+   "word": "up",
+   "startMs": 1470,
+   "endMs": 1660
+  },
+  {
+   "word": "on",
+   "startMs": 1660,
+   "endMs": 1780
+  },
+  {
+   "word": "GitHub",
+   "startMs": 1780,
+   "endMs": 2130
+  },
+  {
+   "word": "today.",
+   "startMs": 2130,
+   "endMs": 2590
+  },
+  {
+   "word": "And",
+   "startMs": 2590,
+   "endMs": 2690
+  },
+  {
+   "word": "number",
+   "startMs": 2690,
+   "endMs": 2960
+  },
+  {
+   "word": "two",
+   "startMs": 2960,
+   "endMs": 3200
+  },
+  {
+   "word": "is",
+   "startMs": 3200,
+   "endMs": 3360
+  },
+  {
+   "word": "basically",
+   "startMs": 3360,
+   "endMs": 3840
+  },
+  {
+   "word": "a",
+   "startMs": 3840,
+   "endMs": 3890
+  },
+  {
+   "word": "business",
+   "startMs": 3890,
+   "endMs": 4320
+  },
+  {
+   "word": "in",
+   "startMs": 4320,
+   "endMs": 4430
+  },
+  {
+   "word": "a",
+   "startMs": 4430,
+   "endMs": 4480
+  },
+  {
+   "word": "box.",
+   "startMs": 4480,
+   "endMs": 5120
+  },
+  {
+   "word": "First,",
+   "startMs": 5120,
+   "endMs": 5540
+  },
+  {
+   "word": "Strix.",
+   "startMs": 5540,
+   "endMs": 6020
+  },
+  {
+   "word": "It's",
+   "startMs": 6020,
+   "endMs": 6260
+  },
+  {
+   "word": "an",
+   "startMs": 6260,
+   "endMs": 6380
+  },
+  {
+   "word": "open",
+   "startMs": 6380,
+   "endMs": 6620
+  },
+  {
+   "word": "source",
+   "startMs": 6620,
+   "endMs": 6980
+  },
+  {
+   "word": "AI",
+   "startMs": 6980,
+   "endMs": 7100
+  },
+  {
+   "word": "penetration",
+   "startMs": 7100,
+   "endMs": 7770
+  },
+  {
+   "word": "testing",
+   "startMs": 7770,
+   "endMs": 8190
+  },
+  {
+   "word": "agent.",
+   "startMs": 8190,
+   "endMs": 8730
+  },
+  {
+   "word": "Basically,",
+   "startMs": 8730,
+   "endMs": 9200
+  },
+  {
+   "word": "it",
+   "startMs": 9200,
+   "endMs": 9390
+  },
+  {
+   "word": "hacks",
+   "startMs": 9390,
+   "endMs": 9560
+  },
+  {
+   "word": "your",
+   "startMs": 9560,
+   "endMs": 9770
+  },
+  {
+   "word": "own",
+   "startMs": 9770,
+   "endMs": 9920
+  },
+  {
+   "word": "app",
+   "startMs": 9920,
+   "endMs": 10090
+  },
+  {
+   "word": "before",
+   "startMs": 10090,
+   "endMs": 10370
+  },
+  {
+   "word": "someone",
+   "startMs": 10370,
+   "endMs": 10740
+  },
+  {
+   "word": "else",
+   "startMs": 10740,
+   "endMs": 10950
+  },
+  {
+   "word": "does.",
+   "startMs": 10950,
+   "endMs": 11420
+  },
+  {
+   "word": "It",
+   "startMs": 11420,
+   "endMs": 11450
+  },
+  {
+   "word": "finds",
+   "startMs": 11450,
+   "endMs": 11790
+  },
+  {
+   "word": "vulnerabilities,",
+   "startMs": 11790,
+   "endMs": 12480
+  },
+  {
+   "word": "then",
+   "startMs": 12480,
+   "endMs": 12640
+  },
+  {
+   "word": "it",
+   "startMs": 12640,
+   "endMs": 12720
+  },
+  {
+   "word": "helps",
+   "startMs": 12720,
+   "endMs": 13040
+  },
+  {
+   "word": "fix",
+   "startMs": 13040,
+   "endMs": 13280
+  },
+  {
+   "word": "them.",
+   "startMs": 13280,
+   "endMs": 13520
+  },
+  {
+   "word": "This",
+   "startMs": 13520,
+   "endMs": 13750
+  },
+  {
+   "word": "thing",
+   "startMs": 13750,
+   "endMs": 14040
+  },
+  {
+   "word": "got",
+   "startMs": 14040,
+   "endMs": 14200
+  },
+  {
+   "word": "1900",
+   "startMs": 14200,
+   "endMs": 14920
+  },
+  {
+   "word": "stars",
+   "startMs": 14920,
+   "endMs": 15210
+  },
+  {
+   "word": "today",
+   "startMs": 15210,
+   "endMs": 15490
+  },
+  {
+   "word": "alone.",
+   "startMs": 15490,
+   "endMs": 16110
+  },
+  {
+   "word": "And",
+   "startMs": 16110,
+   "endMs": 16130
+  },
+  {
+   "word": "here's",
+   "startMs": 16130,
+   "endMs": 16490
+  },
+  {
+   "word": "why",
+   "startMs": 16490,
+   "endMs": 16640
+  },
+  {
+   "word": "it",
+   "startMs": 16640,
+   "endMs": 16750
+  },
+  {
+   "word": "matters.",
+   "startMs": 16750,
+   "endMs": 17440
+  },
+  {
+   "word": "Agencies",
+   "startMs": 17440,
+   "endMs": 17950
+  },
+  {
+   "word": "charge",
+   "startMs": 17950,
+   "endMs": 18300
+  },
+  {
+   "word": "$5,000",
+   "startMs": 18300,
+   "endMs": 19250
+  },
+  {
+   "word": "plus",
+   "startMs": 19250,
+   "endMs": 19440
+  },
+  {
+   "word": "for",
+   "startMs": 19440,
+   "endMs": 19600
+  },
+  {
+   "word": "the",
+   "startMs": 19600,
+   "endMs": 19760
+  },
+  {
+   "word": "kind",
+   "startMs": 19760,
+   "endMs": 19990
+  },
+  {
+   "word": "of",
+   "startMs": 19990,
+   "endMs": 20100
+  },
+  {
+   "word": "security",
+   "startMs": 20100,
+   "endMs": 20570
+  },
+  {
+   "word": "audit",
+   "startMs": 20570,
+   "endMs": 20860
+  },
+  {
+   "word": "this",
+   "startMs": 20860,
+   "endMs": 21090
+  },
+  {
+   "word": "can",
+   "startMs": 21090,
+   "endMs": 21260
+  },
+  {
+   "word": "run",
+   "startMs": 21260,
+   "endMs": 21420
+  },
+  {
+   "word": "overnight.",
+   "startMs": 21420,
+   "endMs": 22130
+  },
+  {
+   "word": "Second,",
+   "startMs": 22130,
+   "endMs": 22590
+  },
+  {
+   "word": "Alibaba",
+   "startMs": 22590,
+   "endMs": 23000
+  },
+  {
+   "word": "page",
+   "startMs": 23000,
+   "endMs": 23230
+  },
+  {
+   "word": "agent.",
+   "startMs": 23230,
+   "endMs": 23780
+  },
+  {
+   "word": "This",
+   "startMs": 23780,
+   "endMs": 23920
+  },
+  {
+   "word": "one",
+   "startMs": 23920,
+   "endMs": 24090
+  },
+  {
+   "word": "is",
+   "startMs": 24090,
+   "endMs": 24200
+  },
+  {
+   "word": "wild.",
+   "startMs": 24200,
+   "endMs": 24720
+  },
+  {
+   "word": "You",
+   "startMs": 24720,
+   "endMs": 24910
+  },
+  {
+   "word": "add",
+   "startMs": 24910,
+   "endMs": 25080
+  },
+  {
+   "word": "one",
+   "startMs": 25080,
+   "endMs": 25260
+  },
+  {
+   "word": "script",
+   "startMs": 25260,
+   "endMs": 25620
+  },
+  {
+   "word": "tag",
+   "startMs": 25620,
+   "endMs": 25800
+  },
+  {
+   "word": "to",
+   "startMs": 25800,
+   "endMs": 25950
+  },
+  {
+   "word": "a",
+   "startMs": 25950,
+   "endMs": 25980
+  },
+  {
+   "word": "website",
+   "startMs": 25980,
+   "endMs": 26410
+  },
+  {
+   "word": "and",
+   "startMs": 26410,
+   "endMs": 26590
+  },
+  {
+   "word": "now",
+   "startMs": 26590,
+   "endMs": 26770
+  },
+  {
+   "word": "users",
+   "startMs": 26770,
+   "endMs": 27070
+  },
+  {
+   "word": "can",
+   "startMs": 27070,
+   "endMs": 27310
+  },
+  {
+   "word": "control",
+   "startMs": 27310,
+   "endMs": 27690
+  },
+  {
+   "word": "the",
+   "startMs": 27690,
+   "endMs": 27860
+  },
+  {
+   "word": "interface",
+   "startMs": 27860,
+   "endMs": 28480
+  },
+  {
+   "word": "with",
+   "startMs": 28480,
+   "endMs": 28740
+  },
+  {
+   "word": "plain",
+   "startMs": 28740,
+   "endMs": 28960
+  },
+  {
+   "word": "English.",
+   "startMs": 28960,
+   "endMs": 29360
+  },
+  {
+   "word": "Think",
+   "startMs": 29530,
+   "endMs": 29620
+  },
+  {
+   "word": "client",
+   "startMs": 29620,
+   "endMs": 29940
+  },
+  {
+   "word": "onboarding,",
+   "startMs": 29940,
+   "endMs": 30590
+  },
+  {
+   "word": "form",
+   "startMs": 30590,
+   "endMs": 30770
+  },
+  {
+   "word": "filling,",
+   "startMs": 30770,
+   "endMs": 31240
+  },
+  {
+   "word": "software",
+   "startMs": 31240,
+   "endMs": 31660
+  },
+  {
+   "word": "demos,",
+   "startMs": 31660,
+   "endMs": 32080
+  },
+  {
+   "word": "internal",
+   "startMs": 32080,
+   "endMs": 32460
+  },
+  {
+   "word": "tools,",
+   "startMs": 32460,
+   "endMs": 32800
+  },
+  {
+   "word": "customer",
+   "startMs": 32800,
+   "endMs": 33120
+  },
+  {
+   "word": "support",
+   "startMs": 33120,
+   "endMs": 33450
+  },
+  {
+   "word": "flows.",
+   "startMs": 33450,
+   "endMs": 33840
+  },
+  {
+   "word": "That",
+   "startMs": 33840,
+   "endMs": 34060
+  },
+  {
+   "word": "is",
+   "startMs": 34060,
+   "endMs": 34170
+  },
+  {
+   "word": "not",
+   "startMs": 34170,
+   "endMs": 34330
+  },
+  {
+   "word": "just",
+   "startMs": 34330,
+   "endMs": 34550
+  },
+  {
+   "word": "a",
+   "startMs": 34550,
+   "endMs": 34600
+  },
+  {
+   "word": "cool",
+   "startMs": 34600,
+   "endMs": 34820
+  },
+  {
+   "word": "repo.",
+   "startMs": 34820,
+   "endMs": 35200
+  },
+  {
+   "word": "That",
+   "startMs": 35200,
+   "endMs": 35420
+  },
+  {
+   "word": "is",
+   "startMs": 35420,
+   "endMs": 35530
+  },
+  {
+   "word": "a",
+   "startMs": 35530,
+   "endMs": 35580
+  },
+  {
+   "word": "service",
+   "startMs": 35580,
+   "endMs": 35970
+  },
+  {
+   "word": "you",
+   "startMs": 35970,
+   "endMs": 36130
+  },
+  {
+   "word": "can",
+   "startMs": 36130,
+   "endMs": 36430
+  },
+  {
+   "word": "sell",
+   "startMs": 36430,
+   "endMs": 36510
+  },
+  {
+   "word": "tomorrow.",
+   "startMs": 36510,
+   "endMs": 37200
+  },
+  {
+   "word": "Third,",
+   "startMs": 37200,
+   "endMs": 37600
+  },
+  {
+   "word": "Meetaly.",
+   "startMs": 37600,
+   "endMs": 38170
+  },
+  {
+   "word": "It's",
+   "startMs": 38170,
+   "endMs": 38430
+  },
+  {
+   "word": "an",
+   "startMs": 38430,
+   "endMs": 38500
+  },
+  {
+   "word": "AI",
+   "startMs": 38500,
+   "endMs": 38610
+  },
+  {
+   "word": "meeting",
+   "startMs": 38610,
+   "endMs": 39000
+  },
+  {
+   "word": "assistant",
+   "startMs": 39000,
+   "endMs": 39790
+  },
+  {
+   "word": "that",
+   "startMs": 39790,
+   "endMs": 39840
+  },
+  {
+   "word": "runs",
+   "startMs": 39840,
+   "endMs": 40080
+  },
+  {
+   "word": "fully",
+   "startMs": 40080,
+   "endMs": 40400
+  },
+  {
+   "word": "on",
+   "startMs": 40400,
+   "endMs": 40480
+  },
+  {
+   "word": "your",
+   "startMs": 40480,
+   "endMs": 40640
+  },
+  {
+   "word": "own",
+   "startMs": 40640,
+   "endMs": 40720
+  },
+  {
+   "word": "machine.",
+   "startMs": 40720,
+   "endMs": 41280
+  },
+  {
+   "word": "No",
+   "startMs": 41280,
+   "endMs": 41440
+  },
+  {
+   "word": "cloud,",
+   "startMs": 41440,
+   "endMs": 41840
+  },
+  {
+   "word": "no",
+   "startMs": 41840,
+   "endMs": 42030
+  },
+  {
+   "word": "random",
+   "startMs": 42030,
+   "endMs": 42230
+  },
+  {
+   "word": "SaaS",
+   "startMs": 42230,
+   "endMs": 42410
+  },
+  {
+   "word": "storing",
+   "startMs": 42410,
+   "endMs": 42750
+  },
+  {
+   "word": "your",
+   "startMs": 42750,
+   "endMs": 42950
+  },
+  {
+   "word": "calls,",
+   "startMs": 42950,
+   "endMs": 43290
+  },
+  {
+   "word": "no",
+   "startMs": 43290,
+   "endMs": 43390
+  },
+  {
+   "word": "sensitive",
+   "startMs": 43390,
+   "endMs": 43820
+  },
+  {
+   "word": "meeting",
+   "startMs": 43820,
+   "endMs": 44170
+  },
+  {
+   "word": "notes",
+   "startMs": 44170,
+   "endMs": 44430
+  },
+  {
+   "word": "leaving",
+   "startMs": 44430,
+   "endMs": 44800
+  },
+  {
+   "word": "your",
+   "startMs": 44800,
+   "endMs": 45040
+  },
+  {
+   "word": "computer.",
+   "startMs": 45040,
+   "endMs": 45570
+  },
+  {
+   "word": "This",
+   "startMs": 45570,
+   "endMs": 45760
+  },
+  {
+   "word": "matters",
+   "startMs": 45760,
+   "endMs": 46080
+  },
+  {
+   "word": "for",
+   "startMs": 46080,
+   "endMs": 46270
+  },
+  {
+   "word": "law",
+   "startMs": 46270,
+   "endMs": 46380
+  },
+  {
+   "word": "firms,",
+   "startMs": 46380,
+   "endMs": 46730
+  },
+  {
+   "word": "banks,",
+   "startMs": 46730,
+   "endMs": 47080
+  },
+  {
+   "word": "agencies,",
+   "startMs": 47080,
+   "endMs": 47590
+  },
+  {
+   "word": "and",
+   "startMs": 47590,
+   "endMs": 47740
+  },
+  {
+   "word": "any",
+   "startMs": 47740,
+   "endMs": 47890
+  },
+  {
+   "word": "business",
+   "startMs": 47890,
+   "endMs": 48290
+  },
+  {
+   "word": "that",
+   "startMs": 48290,
+   "endMs": 48670
+  },
+  {
+   "word": "actually",
+   "startMs": 48670,
+   "endMs": 48910
+  },
+  {
+   "word": "cares",
+   "startMs": 48910,
+   "endMs": 49160
+  },
+  {
+   "word": "about",
+   "startMs": 49160,
+   "endMs": 49410
+  },
+  {
+   "word": "privacy.",
+   "startMs": 49410,
+   "endMs": 50000
+  },
+  {
+   "word": "It",
+   "startMs": 50000,
+   "endMs": 50100
+  },
+  {
+   "word": "already",
+   "startMs": 50100,
+   "endMs": 50510
+  },
+  {
+   "word": "has",
+   "startMs": 50510,
+   "endMs": 50720
+  },
+  {
+   "word": "over",
+   "startMs": 50720,
+   "endMs": 50940
+  },
+  {
+   "word": "14,000",
+   "startMs": 50940,
+   "endMs": 51870
+  },
+  {
+   "word": "stars",
+   "startMs": 51870,
+   "endMs": 52160
+  },
+  {
+   "word": "and",
+   "startMs": 52160,
+   "endMs": 52380
+  },
+  {
+   "word": "it's",
+   "startMs": 52380,
+   "endMs": 52540
+  },
+  {
+   "word": "still",
+   "startMs": 52540,
+   "endMs": 52850
+  },
+  {
+   "word": "climbing.",
+   "startMs": 52850,
+   "endMs": 53440
+  },
+  {
+   "word": "I",
+   "startMs": 53440,
+   "endMs": 53490
+  },
+  {
+   "word": "post",
+   "startMs": 53490,
+   "endMs": 53710
+  },
+  {
+   "word": "the",
+   "startMs": 53710,
+   "endMs": 53880
+  },
+  {
+   "word": "hottest",
+   "startMs": 53880,
+   "endMs": 54270
+  },
+  {
+   "word": "AI",
+   "startMs": 54270,
+   "endMs": 54450
+  },
+  {
+   "word": "repos",
+   "startMs": 54450,
+   "endMs": 54740
+  },
+  {
+   "word": "every",
+   "startMs": 54740,
+   "endMs": 54940
+  },
+  {
+   "word": "day.",
+   "startMs": 54940,
+   "endMs": 55360
+  },
+  {
+   "word": "Follow",
+   "startMs": 55360,
+   "endMs": 55600
+  },
+  {
+   "word": "so",
+   "startMs": 55690,
+   "endMs": 55770
+  },
+  {
+   "word": "you",
+   "startMs": 55770,
+   "endMs": 55830
+  },
+  {
+   "word": "don't",
+   "startMs": 55830,
+   "endMs": 56060
+  },
+  {
+   "word": "miss",
+   "startMs": 56060,
+   "endMs": 56250
+  },
+  {
+   "word": "tomorrows.",
+   "startMs": 56250,
+   "endMs": 56880
+  }
+ ],
+ "avatarTransparent": true
+}

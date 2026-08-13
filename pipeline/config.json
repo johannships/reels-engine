@@ -1,0 +1,155 @@
+{
+  "series": "repo-radar",
+  "itemsPerReel": 3,
+  "script": {
+    "hookMaxWords": 16,
+    "wordsPerItem": {
+      "min": 22,
+      "max": 32
+    },
+    "ctaMaxWords": 12,
+    "totalTargetSec": [
+      28,
+      38
+    ],
+    "bannedPhrases": [
+      "game-changer",
+      "game changer",
+      "unlock",
+      "revolutionize",
+      "insane",
+      "mind-blowing",
+      "cutting-edge",
+      "comprehensive",
+      "in today's video",
+      "let's dive in",
+      "did you know",
+      "crazy, right"
+    ],
+    "voiceRules": [
+      "Short declarative sentences. Numbers over adjectives.",
+      "Every item ends with an operator angle: who makes money with this and how.",
+      "Scene 2 starts with the word 'First', scene 3 with 'Second', scene 4 with 'Third', the CTA scene with 'I'. This is required for caption alignment.",
+      "No greeting, no outro beyond the CTA line."
+    ],
+    "ctaRotation": [
+      "I post the best AI tips and news daily. Follow so you don't miss tomorrow's.",
+      "New AI money plays every single day. Follow so you don't miss tomorrow's.",
+      "Full breakdowns go to the newsletter. Link in bio."
+    ]
+  },
+  "breakout": {
+    "minStarsToday": 1200,
+    "minDelta": 500,
+    "maxPerDay": 2,
+    "autopost": false
+  },
+  "research": {
+    "keywords": [
+      "ai",
+      "llm",
+      "agent",
+      "gpt",
+      "claude",
+      "ml",
+      "rag",
+      "voice",
+      "model",
+      "copilot",
+      "autonomous",
+      "transcription",
+      "diffusion"
+    ],
+    "minStarsToday": 150,
+    "noRepeatDays": 30
+  },
+  "video": {
+    "fps": 30,
+    "speed": 1.08,
+    "avatarLooks": [],
+    "avatarFocusY": 0.4,
+    "loudnormI": -14,
+    "voice": {
+      "speed": 1.3,
+      "elevenlabs_settings": {
+        "model": "eleven_v3",
+        "stability": 0.5,
+        "similarity_boost": 0.85
+      }
+    }
+  },
+  "paths": {
+    "studio": "../studio",
+    "episodes": "../episodes"
+  },
+  "posting": {
+    "dailyDelayHours": 24,
+    "titleStyle": "operator",
+    "mode": "approval",
+    "generation": "propose"
+  },
+  "topics": {
+    "subreddits": [
+      "LocalLLaMA",
+      "OpenAI",
+      "ClaudeAI",
+      "singularity"
+    ],
+    "extraKeywords": [
+      "gemini",
+      "openai",
+      "gpt",
+      "claude",
+      "anthropic",
+      "deepseek",
+      "qwen",
+      "llama",
+      "mistral",
+      "grok",
+      "notebooklm",
+      "copilot",
+      "cursor",
+      "codex",
+      "midjourney",
+      "runway",
+      "elevenlabs",
+      "heygen",
+      "nvidia",
+      "kimi",
+      "glm",
+      "hermes"
+    ],
+    "noRepeatDays": 14,
+    "priorityKeywords": [
+      "claude code",
+      "claude",
+      "cursor",
+      "codex",
+      "ai agent",
+      "agent"
+    ],
+    "feeds": [
+      "https://techcrunch.com/category/artificial-intelligence/feed/",
+      "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml",
+      "https://venturebeat.com/category/ai/feed/"
+    ]
+  },
+  "identity": {
+    "name": "Your Name",
+    "handle": "@yourhandle",
+    "positioning": "a creator in your niche (the niche interview in CLAUDE.md fills this in)",
+    "audience": "who you make content for",
+    "site": "",
+    "community": ""
+  },
+  "funnel": {
+    "commentKeyword": "TOOLKIT",
+    "magnet": "my full toolkit, documented",
+    "repoKeyword": "REPOS",
+    "repoMagnet": "today's repos plus my full repo radar"
+  },
+  "notifications": {
+    "telegram": true,
+    "_comment": "true = every QA-passed video is sent to your Telegram for approval. Set false only if another agent is your interface."
+  }
+}

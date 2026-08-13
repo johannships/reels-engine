@@ -1,0 +1,31 @@
+# secrets
+pipeline/.env
+
+# generated / media (episodes stay on the machine that made them)
+episodes/
+inbox/
+*.mp4
+*.mov
+*.wav
+*.png
+*.log
+pipeline/metrics.csv
+
+# node / remotion
+node_modules/
+studio/out/
+.remotion/
+
+# os
+.DS_Store
+
+# python
+__pycache__/
+*.pyc
+
+# auto-downloaded models
+pipeline/models/
+
+# build artifacts
+*.zip
+config.local.json

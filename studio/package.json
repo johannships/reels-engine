@@ -1,0 +1,21 @@
+{
+  "name": "reels-engine-studio",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Remotion template for the Reels Engine vertical short-form pipeline",
+  "scripts": {
+    "dev": "remotion studio",
+    "render": "remotion render RepoRadar out/preview.mp4",
+    "stills": "remotion still RepoRadar out/stills/intro.png --frame=60 && remotion still RepoRadar out/stills/repo.png --frame=300 && remotion still RepoRadar out/stills/cta.png --frame=1280"
+  },
+  "dependencies": {
+    "@remotion/cli": "^4.0.484",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "remotion": "^4.0.484"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.17",
+    "typescript": "^6.0.3"
+  }
+}

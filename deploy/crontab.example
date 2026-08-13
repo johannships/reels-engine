@@ -1,0 +1,15 @@
+# Reels Engine schedule (server timezone; check `timedatectl`).
+# Edit REPO to your clone path, then: crontab deploy/crontab.example
+REPO=/home/you/reels-engine
+
+# Trend watcher: every 2 hours — breakout videos while the repo is still hot
+0 */2 * * *  cd $REPO/pipeline && /usr/bin/python3 watch.py  >> watch.log 2>&1
+
+# Daily episode: weekdays 06:00 — research -> script -> HeyGen -> final.mp4
+0 6 * * 1-5  cd $REPO/pipeline && /usr/bin/python3 daily.py  >> daily.log 2>&1
+
+# Weekly optimizer: Sunday 18:00 — metrics + feedback -> style-memo update
+0 18 * * 0   cd $REPO/pipeline && /usr/bin/python3 analyze.py >> analyze.log 2>&1
+
+# Media server for Metricool (or run under systemd/tmux instead):
+@reboot      cd $REPO/pipeline && /usr/bin/python3 serve.py >> serve.log 2>&1
