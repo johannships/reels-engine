@@ -93,7 +93,13 @@ def fix_misheard(words, epdir):
         for w in (sc.get("text") or "").split():
             k = norm(w)
             if k:
-                vocab.setdefault(k, w.strip(".,!?;:\"'"))
+                cand = w.strip(".,!?;:\"'")
+                cur = vocab.get(k)
+                # ALL-CAPS script words (CTA keywords) beat other casings, so
+                # a lowercase use earlier in the script can't demote "TOOLS"
+                # to "tools" in the caption that matters.
+                if cur is None or (cand.isupper() and len(cand) > 1 and not cur.isupper()):
+                    vocab[k] = cand
     for entry in words:
         raw = entry["word"]
         m = re.match(r"^(\W*)([\w'-]+)(\W*)$", raw)
