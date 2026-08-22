@@ -8,6 +8,9 @@ Checks (writes <episode>/qa.json, exit 0 = pass, 1 = fail):
   freeze    no frozen video >= 3s (stuck renderer)
   captions  whisper heard >= 70% of the script's word count (audio intact,
             not garbled, right file)
+  caption_sync
+            captions land ON the words: the caption timeline and the finished
+            audio's speech envelope cross-correlate at a lag within 0.25s
   face      the avatar's face is fully in frame with headroom: sampled frames
             of the bottom half must show a face whose box top sits >= 60px
             below the seam and whose box bottom stays >= 40px above the frame
@@ -85,6 +88,74 @@ def check_captions(epdir, report):
     ok = ratio >= 0.7
     report["captions"] = {"pass": bool(ok), "heard": heard,
                           "scripted": scripted, "ratio": round(ratio, 2)}
+    return ok
+
+
+CAPTION_LAG_MAX = 0.25   # seconds of drift tolerated between captions and speech
+
+
+def check_caption_sync(path, epdir, report):
+    """Are the captions actually on the words?
+
+    check_captions() compares word *counts*, which passes happily even when every
+    caption is half a second late. This measures timing directly: build a
+    speech-present timeline from words.json (what the captions are drawn from),
+    build another from the finished audio, and cross-correlate. If the captions
+    line up, the best lag is ~0.
+
+    Deliberately no whisper dependency here — this runs on the final file.
+    """
+    wpath = os.path.join(epdir, "words.json")
+    if not os.path.exists(wpath):
+        report["caption_sync"] = {"pass": True, "note": "skipped (no words.json)"}
+        return True
+    try:
+        import numpy as np
+    except ImportError:
+        report["caption_sync"] = {"pass": True, "note": "SKIPPED — numpy not installed"}
+        return True
+
+    words = [w for w in json.load(open(wpath))["transcription"] if w["text"].strip()]
+    if not words:
+        report["caption_sync"] = {"pass": True, "note": "skipped (no words)"}
+        return True
+
+    raw = subprocess.run(["ffmpeg", "-v", "error", "-i", path, "-ac", "1", "-ar", "16000",
+                          "-f", "s16le", "-"], capture_output=True).stdout
+    a = np.frombuffer(raw, dtype=np.int16).astype(float) / 32768
+    hop = 320                                    # 20 ms buckets
+    n = len(a) // hop
+    if n < 50:
+        report["caption_sync"] = {"pass": True, "note": "skipped (audio too short)"}
+        return True
+    db = np.array([20 * np.log10(np.sqrt((a[i*hop:(i+1)*hop] ** 2).mean()) + 1e-12)
+                   for i in range(n)])
+
+    # Align on ONSETS, not on spans. A word's span includes its attack and decay,
+    # and whisper's boundaries are wider than the energy envelope, which biases a
+    # span-vs-span correlation by ~0.2s. Rising energy vs word-start impulses
+    # gives a sharp, unbiased peak.
+    heard = np.diff(np.clip(db, -60, 0), prepend=db[0])
+    heard = np.clip(heard, 0, None)
+
+    caption = np.zeros(n)
+    for w in words:
+        i0 = int((w["offsets"]["from"] / 1000) / 0.02)
+        if 0 <= i0 < n:
+            caption[i0] = 1.0
+
+    heard -= heard.mean()
+    caption -= caption.mean()
+    span = int(1.5 / 0.02)                       # search +/- 1.5s
+    lags = range(-span, span + 1)
+    scores = [float(np.dot(np.roll(caption, L), heard)) for L in lags]
+    best = list(lags)[int(np.argmax(scores))] * 0.02
+
+    ok = abs(best) <= CAPTION_LAG_MAX
+    report["caption_sync"] = {"pass": bool(ok), "lag_sec": round(best, 3),
+                              "tolerance": CAPTION_LAG_MAX}
+    if not ok:
+        print(f"!! captions drift {best:+.2f}s against the audio", file=sys.stderr)
     return ok
 
 
@@ -213,6 +284,7 @@ def main():
             check_loudness(path, report),
             check_black_freeze(path, report),
             check_captions(epdir, report),
+            check_caption_sync(video, epdir, report),
             check_face_fullscreen(path, windows, report),
         ]
     else:
@@ -221,6 +293,7 @@ def main():
             check_loudness(path, report),
             check_black_freeze(path, report),
             check_captions(epdir, report),
+            check_caption_sync(video, epdir, report),
             check_seam(path, dur, report),
             check_face(path, dur, report),
         ]
