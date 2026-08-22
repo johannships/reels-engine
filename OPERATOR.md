@@ -57,7 +57,7 @@ audience. Quality is the moat — one sloppy video costs more than a missed day.
 4. Prompts in `scriptgen.py` — only for structural changes; keep the
    First/Second/Third scene anchors (caption alignment depends on them).
 5. `studio/` template — design changes need Johann's eyes on a rendered
-   still BEFORE going live: `npx remotion still RepoRadar out/test.png
+   still BEFORE going live: `npx remotion still RepoDrop out/test.png
    --frame=300 --props=<episode>/props.json`.
 
 ## Guardrails (hard)

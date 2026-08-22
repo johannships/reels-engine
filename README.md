@@ -32,7 +32,7 @@ the machine makes before you sign up for anything:
 ```
 git clone https://github.com/johannships/reels-engine && cd reels-engine
 mkdir -p episodes/demo-episode && cp examples/demo-episode/* episodes/demo-episode/
-cd studio && npm install && npx remotion render RepoRadar \
+cd studio && npm install && npx remotion render RepoDrop \
   ../episodes/demo-episode/canvas.mp4 --props=../examples/demo-episode/props.preview.json
 ```
 

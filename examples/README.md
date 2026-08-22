@@ -20,7 +20,7 @@ repo card, kinetic panel, and CTA scenes. Colors/fonts live in
 ```
 mkdir -p episodes/demo-episode
 cp examples/demo-episode/* episodes/demo-episode/
-cd studio && npx remotion render RepoRadar ../episodes/demo-episode/canvas.mp4 \
+cd studio && npx remotion render RepoDrop ../episodes/demo-episode/canvas.mp4 \
   --props=../examples/demo-episode/props.preview.json
 ```
 

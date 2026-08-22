@@ -5,8 +5,8 @@
   "description": "Remotion template for the Reels Engine vertical short-form pipeline",
   "scripts": {
     "dev": "remotion studio",
-    "render": "remotion render RepoRadar out/preview.mp4",
-    "stills": "remotion still RepoRadar out/stills/intro.png --frame=60 && remotion still RepoRadar out/stills/repo.png --frame=300 && remotion still RepoRadar out/stills/cta.png --frame=1280"
+    "render": "remotion render RepoDrop out/preview.mp4",
+    "stills": "remotion still RepoDrop out/stills/intro.png --frame=60 && remotion still RepoDrop out/stills/repo.png --frame=300 && remotion still RepoDrop out/stills/cta.png --frame=1280"
   },
   "dependencies": {
     "@remotion/cli": "^4.0.484",

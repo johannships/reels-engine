@@ -304,6 +304,9 @@ def main():
             sc["image"] = f"data:image/jpeg;base64,{b64}"
 
     layout = script.get("layout", "split")
+    # RepoDrop is the default look; set "style": "RepoRadar" in the script to
+    # render an older episode with the previous composition.
+    STYLE = script.get("style", "RepoDrop")
     props = {
         "date": script["date"], "scenes": scenes, "layout": layout,
         "avatarTransparent": True, "captions": words,
@@ -313,15 +316,15 @@ def main():
 
     # fullscreen: graphics+captions render as a TRANSPARENT overlay (ProRes
     # 4444) — the full-frame avatar shows through wherever nothing is drawn.
-    if layout == "fullscreen":
+    if layout in ("fullscreen", "pip"):
         canvas = os.path.join(epdir, "canvas.mov")
-        render_cmd = ["npx", "remotion", "render", "RepoRadar", canvas,
+        render_cmd = ["npx", "remotion", "render", STYLE, canvas,
                       f"--props={props_path}", "--codec=prores",
                       "--prores-profile=4444", "--image-format=png",
                       "--pixel-format=yuva444p10le"]
     else:
         canvas = os.path.join(epdir, "canvas.mp4")
-        render_cmd = ["npx", "remotion", "render", "RepoRadar", canvas,
+        render_cmd = ["npx", "remotion", "render", STYLE, canvas,
                       f"--props={props_path}"]
     if REELS_BROWSER:
         render_cmd.append(f"--browser-executable={REELS_BROWSER}")
@@ -347,7 +350,7 @@ def main():
 
     # fullscreen: avatar covers the whole 1080x1920 frame (content region
     # zoomed), face composed toward the upper third; graphics overlay on top.
-    if layout == "fullscreen":
+    if layout in ("fullscreen", "pip"):
         scf = max(1080 / cw, 1920 / ch)
         rwf, rhf = round(cw * scf), round(ch * scf)
         if face:
