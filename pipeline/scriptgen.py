@@ -1,11 +1,23 @@
 #!/usr/bin/env python3
-"""Generate the day's reel script from research.json using your z.ai (GLM)
-subscription via its Anthropic-compatible endpoint. No per-token billing.
+"""Generate the day's reel script from research.json.
+
+Default provider is the Claude Code CLI in headless mode, authenticated by a
+subscription OAuth token — no per-token API billing. Models are tried in order
+(default: fable for the writing, opus as fallback).
 
 Env (put in pipeline/.env or export):
+  LLM_PROVIDER   "claude-cli" (default) | "http"
+  --- claude-cli ---
+  CLAUDE_CODE_OAUTH_TOKEN  from `claude setup-token` (required)
+  LLM_MODELS     comma-separated fallback chain, default "fable,opus"
+  CLAUDE_BIN     path to the claude binary, default "claude"
+  LLM_TIMEOUT_SEC per-model timeout, default 180
+  WARNING: never set ANTHROPIC_API_KEY here — it outranks the OAuth token and
+  would switch this pipeline to paid per-token billing.
+  --- http (legacy: z.ai / Anthropic API) ---
   LLM_BASE_URL   default https://api.z.ai/api/anthropic
-  LLM_API_KEY    your z.ai coding-plan token   (required)
-  LLM_MODEL      e.g. glm-4.7 / glm-5.2 per your plan (required)
+  LLM_API_KEY    provider token
+  LLM_MODEL      e.g. glm-4.7
 
 Reads:  episodes/<ep>/research.json, style-memo.md, feedback.log, config.json
 Writes: episodes/<ep>/script.json (scenes for the renderer)
@@ -168,12 +180,134 @@ Return ONLY JSON, no markdown fences:
 {{"hook": "...", "items": [{{"repo": "owner/name", "text": "First, ..."}}, ...], "cta": "...", "social": {{"title": "...", "caption": "..."}}}}"""
 
 
-def call_llm(prompt):
+SYSTEM_PROMPT = (
+    "You are a short-form video script writer. You return ONLY a single JSON "
+    "object and nothing else: no preamble, no explanation, no markdown fences. "
+    "You never use tools; you answer directly from the prompt you are given."
+)
+
+
+class LLMError(RuntimeError):
+    """Raised when every model in the chain fails. Callers surface this to
+    Telegram rather than dying silently (see watch.py / daily.py)."""
+
+
+def _extract_json(text):
+    m = re.search(r"\{.*\}", text, re.S)
+    if not m:
+        return None
+    try:
+        return json.loads(m.group(0))
+    except json.JSONDecodeError:
+        return None
+
+
+def _call_claude_cli(prompt):
+    """Generate via the Claude Code CLI in headless print mode.
+
+    Authenticated by CLAUDE_CODE_OAUTH_TOKEN (from `claude setup-token`), which
+    bills against the Claude subscription rather than per-token API credits.
+
+    NOTE: ANTHROPIC_API_KEY takes PRECEDENCE over the OAuth token in Claude
+    Code's auth chain. If it is set we refuse to run, because that would
+    silently switch this pipeline onto paid API billing.
+    """
+    import shutil, subprocess, tempfile
+
+    if os.environ.get("ANTHROPIC_API_KEY"):
+        raise LLMError(
+            "ANTHROPIC_API_KEY is set. It outranks CLAUDE_CODE_OAUTH_TOKEN and "
+            "would bill per-token API pricing instead of the subscription. "
+            "Unset it (Railway: railway variables --unset ANTHROPIC_API_KEY).")
+
+    binary = env("CLAUDE_BIN", "claude")
+    if not shutil.which(binary):
+        raise LLMError(f"'{binary}' not on PATH. Install Claude Code in the image "
+                       "(curl -fsSL https://claude.ai/install.sh | bash).")
+    # Auth is NOT pre-checked: a dev machine keeps credentials in the OS
+    # keychain (no file to stat), while a container uses the OAuth token env
+    # var. We run the command and translate an auth-shaped failure below.
+    AUTH_HINT = ("run `claude setup-token` and set CLAUDE_CODE_OAUTH_TOKEN "
+                 "in the environment")
+
+    # Primary first, then fallbacks. Default: fable (creative writing) -> opus.
+    chain = [m.strip() for m in env("LLM_MODELS", "fable,opus").split(",") if m.strip()]
+    timeout = int(env("LLM_TIMEOUT_SEC", "180"))
+    errors = []
+
+    # Subprocess env: pass the OAuth token through explicitly. env() loads
+    # pipeline/.env into os.environ, so this covers both .env and real env vars.
+    child_env = dict(os.environ)
+    tok = env("CLAUDE_CODE_OAUTH_TOKEN")
+    if tok:
+        child_env["CLAUDE_CODE_OAUTH_TOKEN"] = tok
+    child_env.pop("ANTHROPIC_API_KEY", None)  # belt and braces: never bill API
+
+    # Run from a scratch dir, NOT the repo. In the container cwd is /app, which
+    # has a CLAUDE.md; letting the CLI load project context would waste tokens
+    # on every generation and can leak repo instructions into the script.
+    scratch = tempfile.mkdtemp(prefix="scriptgen-")
+
+    for model in chain:
+        # NB: do NOT add --bare. It skips the credential path that reads
+        # CLAUDE_CODE_OAUTH_TOKEN, so headless auth fails with "Not logged in".
+        # Verified against a clean environment 2026-08-28.
+        cmd = [binary, "-p", prompt,
+               "--model", model,
+               "--system-prompt", SYSTEM_PROMPT,
+               "--output-format", "json",
+               "--no-session-persistence"]
+        try:
+            proc = subprocess.run(cmd, capture_output=True, text=True,
+                                  timeout=timeout, stdin=subprocess.DEVNULL,
+                                  env=child_env, cwd=scratch)
+        except subprocess.TimeoutExpired:
+            errors.append(f"{model}: timed out after {timeout}s")
+            continue
+
+        if proc.returncode != 0:
+            tail = (proc.stderr or proc.stdout or "").strip()[-300:]
+            errors.append(f"{model}: exit {proc.returncode} — {tail}")
+            continue
+
+        try:
+            envelope = json.loads(proc.stdout)
+        except json.JSONDecodeError:
+            errors.append(f"{model}: CLI did not return JSON — {proc.stdout[:200]}")
+            continue
+
+        if envelope.get("is_error"):
+            errors.append(f"{model}: {str(envelope.get('result'))[:200]}")
+            continue
+
+        data = _extract_json(envelope.get("result") or "")
+        if data is None:
+            errors.append(f"{model}: no JSON object in result — "
+                          f"{str(envelope.get('result'))[:200]}")
+            continue
+
+        if model != chain[0]:
+            print(f"[scriptgen] primary model failed; produced with fallback "
+                  f"'{model}'", flush=True)
+        return data
+
+    blob = " ".join(errors).lower()
+    hint = ""
+    if any(w in blob for w in ("auth", "login", "unauthor", "401", "credential", "token")):
+        hint = f"\nLooks like an auth problem: {AUTH_HINT}."
+    elif any(w in blob for w in ("rate limit", "429", "usage limit", "quota")):
+        hint = ("\nLooks like a subscription usage limit. It resets on its own; "
+                "the run will be retried on the next schedule.")
+    raise LLMError("all models failed:\n  " + "\n  ".join(errors) + hint)
+
+
+def _call_http(prompt):
+    """Legacy path: any Anthropic-compatible HTTP endpoint (z.ai, Anthropic API)."""
     base = env("LLM_BASE_URL", "https://api.z.ai/api/anthropic").rstrip("/")
     key = env("LLM_API_KEY")
     model = env("LLM_MODEL")
     if not key or not model:
-        raise SystemExit("Set LLM_API_KEY and LLM_MODEL in pipeline/.env (see PIPELINE.md)")
+        raise LLMError("Set LLM_API_KEY and LLM_MODEL, or use LLM_PROVIDER=claude-cli")
     body = json.dumps({
         "model": model,
         "max_tokens": 1200,
@@ -183,12 +317,22 @@ def call_llm(prompt):
         base + "/v1/messages", data=body,
         headers={"content-type": "application/json", "x-api-key": key,
                  "authorization": f"Bearer {key}", "anthropic-version": "2023-06-01"})
-    resp = json.loads(urllib.request.urlopen(req, timeout=120).read())
+    try:
+        resp = json.loads(urllib.request.urlopen(req, timeout=120).read())
+    except Exception as e:  # surface the status (e.g. 429 quota) to Telegram
+        raise LLMError(f"{model} via {base}: {e}")
     text = "".join(b.get("text", "") for b in resp.get("content", []))
-    m = re.search(r"\{.*\}", text, re.S)
-    if not m:
-        raise SystemExit(f"LLM returned no JSON:\n{text[:500]}")
-    return json.loads(m.group(0))
+    data = _extract_json(text)
+    if data is None:
+        raise LLMError(f"LLM returned no JSON:\n{text[:500]}")
+    return data
+
+
+def call_llm(prompt):
+    provider = env("LLM_PROVIDER", "claude-cli").strip().lower()
+    if provider in ("claude-cli", "claude", "cli"):
+        return _call_claude_cli(prompt)
+    return _call_http(prompt)
 
 
 def refine(research, draft):

@@ -252,9 +252,19 @@ def api_route(method, path, body):
         return 202, {"ok": True, "status": "rendering",
                      "note": "poll GET /api/episodes/<ep> — QA-gated; video "
                              "also lands in Telegram when it passes"}
-    # POST /api/episodes/<ep>/schedule {"inHours": 6}  (1h floor enforced)
+    # POST /api/episodes/<ep>/schedule {"inHours": 6}
+    # NOTE: this endpoint is authenticated ONLY by the URL path token, and that
+    # same token is embedded in every media URL handed to Metricool (and onward
+    # to the platform fetchers). It is therefore NOT a secret, and must never be
+    # able to publish on its own. metricool.py::_gate() independently requires a
+    # QA pass and a Telegram approval marker, so this route can only ever
+    # re-trigger scheduling for an episode the owner already approved.
     if method == "POST" and len(parts) == 4 and parts[3] == "schedule":
         ep = parts[2]
+        epdir = os.path.join(EPISODES, ep)
+        if not os.path.exists(os.path.join(epdir, "approved")):
+            return 403, {"ok": False,
+                         "error": "not approved — approve in Telegram first"}
         hours = max(1.0, float(body.get("inHours", 24)))
         ok, out = _tool(["metricool.py", ep, "--in-hours", str(hours)],
                         timeout=300)
@@ -358,7 +368,13 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         return os.path.join(EPISODES, parts[1])
 
     def log_message(self, fmt, *args):
-        print(self.address_string(), fmt % args)
+        # The request line contains the serve token (every path is prefixed
+        # with it), and Railway stdout is not a secret store. Redact it so the
+        # token is not printed on every single request.
+        line = fmt % args
+        if TOKEN:
+            line = line.replace(TOKEN, f"{TOKEN[:4]}…")
+        print(self.address_string(), line)
 
 
 if __name__ == "__main__":
