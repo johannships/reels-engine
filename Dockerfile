@@ -19,6 +19,16 @@ RUN git clone --depth 1 https://github.com/ggml-org/whisper.cpp /tmp/w \
 RUN mkdir -p /models && curl -fsSL -o /models/ggml-small.en.bin \
     https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-small.en.bin
 
+# Claude Code CLI — scriptgen runs it headless (`claude -p`) authenticated by
+# CLAUDE_CODE_OAUTH_TOKEN, so scripts bill against the subscription rather than
+# per-token API credits. Native installer (no Node 22+ requirement).
+ENV PATH="/root/.local/bin:${PATH}"
+RUN curl -fsSL https://claude.ai/install.sh | bash \
+    && CLAUDE_BIN="$(command -v claude || find /root -maxdepth 4 -name claude -type f -perm -u+x | head -1)" \
+    && test -n "$CLAUDE_BIN" \
+    && ln -sf "$CLAUDE_BIN" /usr/local/bin/claude \
+    && claude --version
+
 WORKDIR /app
 COPY studio/package.json studio/package-lock.json studio/
 RUN cd studio && npm ci && npx remotion browser ensure
@@ -29,7 +39,10 @@ COPY . .
 # system chromium remains for screenshot.py page captures.
 ENV WHISPER_MODEL=/models/ggml-small.en.bin \
     SCREENSHOT_BROWSER=/usr/bin/chromium \
-    REELS_EPISODES_DIR=/data/episodes
+    REELS_EPISODES_DIR=/data/episodes \
+    HOME=/root \
+    LLM_PROVIDER=claude-cli \
+    LLM_MODELS=fable,opus
 
 # /data must be a mounted volume (episodes, dedupe state, worker stamps)
 CMD ["python3", "pipeline/worker.py"]

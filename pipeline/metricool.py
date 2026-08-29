@@ -44,6 +44,50 @@ def api(method, path, body=None):
     return json.loads(urllib.request.urlopen(req, timeout=60).read())
 
 
+def _gate(epdir, ep):
+    """Refuse to schedule anything that has not passed QA and been approved.
+
+    This is the last line before the social platforms, so it is the only place
+    the invariant can actually be guaranteed. Fails CLOSED: if state is missing
+    or unreadable, it refuses.
+
+    Escape hatch for deliberate manual use: REELS_ALLOW_UNAPPROVED=1, which is
+    logged loudly. Never set that in the deployed environment.
+    """
+    if env("REELS_ALLOW_UNAPPROVED") == "1":
+        print("!! REELS_ALLOW_UNAPPROVED=1 — approval gate BYPASSED for "
+              f"{ep}. This must never be set on the server.", flush=True)
+        return
+
+    # 1. Explicitly discarded episodes can never post, by any route.
+    if os.path.exists(os.path.join(epdir, "skipped")):
+        raise SystemExit(f"REFUSED: {ep} was skipped/discarded. It will never post.")
+
+    # 2. QA must have run and passed. prep.py writes final.mp4 BEFORE qa runs,
+    #    so "the file exists" says nothing about whether it is good.
+    qa_path = os.path.join(epdir, "qa.json")
+    if not os.path.exists(qa_path):
+        raise SystemExit(f"REFUSED: {ep} has no qa.json — QA never ran.")
+    try:
+        qa = json.load(open(qa_path))
+    except Exception as e:
+        raise SystemExit(f"REFUSED: {ep} qa.json unreadable ({e}).")
+    if qa.get("pass") is not True:
+        raise SystemExit(f"REFUSED: {ep} failed QA (qa.json pass={qa.get('pass')!r}).")
+
+    # 3. Approval. Default is approval-required; an absent config key must NOT
+    #    open the gate, so we default to "approval" rather than trusting config.
+    mode = CFG.get("posting", {}).get("mode", "approval")
+    if mode != "approval":
+        return
+    # approvals._schedule() writes this marker the moment the owner replies
+    # "post N" in Telegram, and removes it again if scheduling fails.
+    if not os.path.exists(os.path.join(epdir, "approved")):
+        raise SystemExit(
+            f"REFUSED: {ep} has not been approved. Reply 'post <n>' in "
+            "Telegram to approve it.")
+
+
 def build_post(ep, social, when_iso):
     providers = [{"network": n.strip()} for n in
                  env("METRICOOL_PROVIDERS", "tiktok,instagram,youtube,linkedin").split(",")]
@@ -81,6 +125,15 @@ def main():
         raise SystemExit("script.json has no social block (re-run scriptgen.py)")
     if not os.path.exists(os.path.join(epdir, "final.mp4")):
         raise SystemExit("no final.mp4 yet (run prep.py)")
+
+    # ---- THE GATE ---------------------------------------------------------
+    # Enforced HERE, at the single chokepoint into every social platform,
+    # rather than in each caller. Previously the approval check lived in four
+    # copy-pasted `if posting.mode == "approval"` branches in daily/watch/
+    # spotlight/topics, which meant any other caller (notably the HTTP
+    # endpoint in serve.py) reached Metricool with no checks at all.
+    _gate(epdir, args.episode)
+    # -----------------------------------------------------------------------
     for k in ("METRICOOL_USER_TOKEN", "METRICOOL_USER_ID", "METRICOOL_BLOG_ID",
               "REELS_PUBLIC_BASE"):
         if not env(k):

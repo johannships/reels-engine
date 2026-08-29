@@ -105,10 +105,30 @@ def _schedule(ep, when_arg):
             if target <= now:
                 target += datetime.timedelta(days=1)
             hours = (target - now).total_seconds() / 3600
+    # The human just said "post N" in Telegram. That is the approval event, so
+    # stamp it on the episode BEFORE calling metricool. metricool._gate() reads
+    # this marker and refuses anything without it, which is what makes "cannot
+    # post without approval" a structural fact rather than a convention.
+    epdir = os.path.join(EPISODES, ep)
+    try:
+        os.makedirs(epdir, exist_ok=True)
+        with open(os.path.join(epdir, "approved"), "w") as f:
+            json.dump({"approved_at": datetime.datetime.utcnow().isoformat(),
+                       "via": "telegram", "hours": round(hours, 2)}, f)
+    except Exception as e:
+        return False, f"could not record approval for {ep}: {e}"
+
     r = subprocess.run(
         [sys.executable, os.path.join(HERE, "metricool.py"), ep,
          "--in-hours", f"{hours:.2f}"], capture_output=True, text=True)
     ok = r.returncode == 0
+    if not ok:
+        # Do not leave a live approval stamp on an episode that failed to
+        # schedule; it would let a later, unreviewed retry through the gate.
+        try:
+            os.remove(os.path.join(epdir, "approved"))
+        except OSError:
+            pass
     return ok, (r.stdout + r.stderr).strip()[-300:]
 
 
