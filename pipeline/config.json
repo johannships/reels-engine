@@ -29,13 +29,14 @@
     "voiceRules": [
       "Short declarative sentences. Numbers over adjectives.",
       "Every item ends with an operator angle: who makes money with this and how.",
-      "Scene 2 starts with the word 'First', scene 3 with 'Second', scene 4 with 'Third', the CTA scene with 'I'. This is required for caption alignment.",
+      "Scene 2 starts with the word 'First', scene 3 with 'Second', scene 4 with 'Third'. This is required for caption alignment.",
+      "The CTA scene is inserted verbatim from config; never rewrite it.",
       "No greeting, no outro beyond the CTA line."
     ],
     "ctaRotation": [
-      "I post the best AI tips and news daily. Follow so you don't miss tomorrow's.",
-      "New AI money plays every single day. Follow so you don't miss tomorrow's.",
-      "Full breakdowns go to the newsletter. Link in bio."
+      "Comment {keyword} and I'll DM you {magnet}, free.",
+      "Comment {keyword} and I'll send you {magnet}, free.",
+      "I post the best AI money plays daily. Follow so you don't miss tomorrow's."
     ]
   },
   "breakout": {

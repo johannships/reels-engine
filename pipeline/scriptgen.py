@@ -73,6 +73,25 @@ def title_rules():
             'Top AI Hack Unveiled!", anything with Unveiled/Ultimate/Master.')
 
 
+
+def cta_line(idx=0):
+    """The spoken CTA, resolved against the channel funnel. ctaRotation entries
+    may carry {keyword}/{magnet} placeholders so committed config stays neutral
+    while the real keyword lives in config.local.json. A follow-CTA earns
+    nothing; the comment keyword feeds ManyChat -> email -> community."""
+    f = CFG.get("funnel", {})
+    rot = CFG["script"]["ctaRotation"]
+    line = rot[idx % len(rot)]
+    # magnet is written copy (may carry parentheticals); the CTA is SPOKEN.
+    # Prefer an explicit funnel.magnetSpoken, else strip parentheticals and
+    # clamp to something a voice can land in one breath.
+    spoken = f.get("magnetSpoken")
+    if not spoken:
+        spoken = re.sub(r"\s*\([^)]*\)", "", f.get("magnet", "the full breakdown"))
+        spoken = " ".join(spoken.split()[:9]).rstrip(",.")
+    return (line.replace("{keyword}", f.get("commentKeyword", "SYSTEM"))
+                .replace("{magnet}", spoken))
+
 def build_prompt(research):
     s = CFG["script"]
     picks = research["picks"]
@@ -88,13 +107,13 @@ Topic: {p['name']}
 Headline: {p['headline']}
 Cross-source data (REAL numbers only, do not alter): {json.dumps(p.get('stats', []))}
 {'' if p.get('stats') else 'NO headline metric exists for this story. Do NOT invent, estimate, or imply any number that is not in the data above. Lead with the named fact instead.'}
-Related coverage: {json.dumps(p.get('sources', []), indent=1)}
+Related coverage: {json.dumps(p.get('sources', []), indent=1)}\n{("THE PLAY (the topic picker chose this topic FOR this operator angle; Scene 3 must be built on it): " + p["play"]) if p.get("play") else ""}
 
 STRUCTURE (hard rules — this is the "money play" format, the channel's viral engine):
 - Scene 1 HOOK: max {s['hookMaxWords']} words. Name the topic explicitly (keyword in the first sentence). Urgency + stakes ("just dropped", "just changed", "nobody's talking about").
 - Scene 2: 28-36 words: what actually happened / what it is, with one real number as the receipt.
 - Scene 3: 28-36 words: THE PLAY — the specific thing an operator builds, sells, or automates with this THIS WEEK. Tool-combo how-tos ("use {p['name']} with <tool they already have>") and honest dollar framing ("agencies charge X for this") are this channel's proven best formats. Never end on "this is interesting" — end on what to do.
-- Scene 4 CTA: exactly: "{s['ctaRotation'][0]}"
+- Scene 4 CTA: exactly: "{cta_line()}"
 - Target 30-40 seconds at ~150 wpm. Banned: {", ".join(s['bannedPhrases'])}. No em dashes.
 - Big numbers as words when spoken.
 - SCENE OPENINGS: each scene opens mid-thought with a concrete subject, the way
@@ -133,7 +152,7 @@ A repo is BREAKING OUT on GitHub right now and this video needs to own the keywo
 STRUCTURE (hard rules):
 - Scene 1 HOOK: max {s['hookMaxWords']} words, urgency-led ("blowing up right now" energy, but factual).
 - Scene 2: the repo, 40-55 words. What it does concretely, the star velocity as a spoken receipt, one specific way an operator makes money with it this week.
-- Scene 3 CTA: exactly: "{s['ctaRotation'][0]}"
+- Scene 3 CTA: exactly: "{cta_line()}"
 - Target 20-30 seconds total at ~150 wpm.
 - Banned: {", ".join(s['bannedPhrases'])}. No em dashes.
 - Write big numbers as words ("nineteen hundred").
@@ -158,7 +177,7 @@ Write today's "Repo Radar" script covering exactly these {len(picks)} GitHub rep
 STRUCTURE (hard rules):
 - Scene 1 HOOK: max {s['hookMaxWords']} words. Number-led or curiosity-led. No greeting.
 - Scenes 2-{1 + len(picks)}: one per repo, {s['wordsPerItem']['min']}-{s['wordsPerItem']['max']} words each. MUST open with the words "First," / "Second," / "Third," respectively (caption alignment depends on it). Each: what it does in one concrete sentence, the star number as a spoken receipt, then the operator angle (who makes money with it and how).
-- Final scene CTA: exactly this line: "{s['ctaRotation'][0]}"
+- Final scene CTA: exactly this line: "{cta_line()}"
 - Target total: {s['totalTargetSec'][0]}-{s['totalTargetSec'][1]} seconds at ~150 wpm. Shorter beats longer; people scroll.
 - Banned words/phrases: {", ".join(s['bannedPhrases'])}. No em dashes.
 - Write numbers as words where the voice clone might stumble ("nineteen hundred", "fourteen thousand").

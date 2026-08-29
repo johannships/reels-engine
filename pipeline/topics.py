@@ -37,6 +37,17 @@ VENDOR_WORDS = TCFG.get("extraKeywords", [
 ])
 
 
+CORP_NEWS = re.compile(
+    r"\b(poach\w*|hires?|hired|joins|joined|departs?|leaves|steps down|"
+    r"resigns?|exec(utive)?s?|CEO|CFO|CTO steps|lawsuit|sues?|sued|court|"
+    r"judge|antitrust|regulat\w+|senate|congress|policy|funding|raises \$|"
+    r"raised \$|valuation|IPO|stock|shares|layoffs?|merger)\b", re.I)
+UTILITY = re.compile(
+    r"\b(open[- ]?sourc\w+|free|launch\w*|releases?|released|tool|app|"
+    r"skill|template|workflow|API|SDK|model|agent|automat\w+|how to|"
+    r"build\w*|self[- ]host\w*)\b", re.I)
+
+
 def fetch_json(url):
     req = urllib.request.Request(url, headers={
         "User-Agent": ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
@@ -229,6 +240,15 @@ def main():
         # audience already engages with
         if any(k in c["title"].lower() for k in TCFG.get("priorityKeywords", [])):
             c["adj"] *= 1.5
+        # GOAL SHAPING: this channel monetizes by giving operators something
+        # to DO (comment keyword -> email -> community). Corporate news
+        # (exec moves, funding, lawsuits) gets viewers nothing to do, so it
+        # is heavily downranked before the judge ever sees the menu; usable
+        # launches/tools/models get boosted.
+        if CORP_NEWS.search(c["title"]):
+            c["adj"] *= 0.2
+        if UTILITY.search(c["title"]):
+            c["adj"] *= 1.4
     cands.sort(key=lambda c: -c["adj"])
     top = cands[:15]
 
@@ -242,29 +262,49 @@ def main():
         return
 
     pick = top[0]
-    topic_name, keyword = None, None
-    if env("LLM_API_KEY"):
-        try:
-            sel = call_llm(
-                "Pick the ONE topic below that would STOP A FOUNDER'S SCROLL. "
-                "Score each candidate on: (1) drama/stakes — deaths, leaks, "
-                "price collapses, admissions, bans beat announcements; (2) a "
-                "recognizable NAME in it (Google, OpenAI, Amazon, Claude...); "
-                "(3) a money angle an operator can act on THIS WEEK; (4) "
-                "specificity — a concrete event beats a trend piece. Corporate "
-                "PR and funding rounds are boring unless the number is shocking. "
-                "NEWS beats GitHub repos (repos have their own daily show) — "
-                "only pick a repo if it is truly the biggest story today. "
-                "Return ONLY JSON: "
-                '{"index": <0-based index>, "topicName": "<display name, e.g. '
-                'Gemini 3.5 Pro>", "keyword": "<the exact search phrase to own>"}'
-                "\n\nCandidates:\n" + json.dumps(
-                    [{"i": i, "title": c["title"], "score": c["score"],
-                      "source": c["source"]} for i, c in enumerate(top)], indent=1))
+    topic_name, keyword, play = None, None, None
+    # NOTE: no env gate here. The old `if env("LLM_API_KEY")` check silently
+    # skipped the judge after the provider moved to the Claude CLI, so raw
+    # HN score picked the topic (that is how exec-poaching news won a slot).
+    try:
+        sel = call_llm(
+            "You pick ONE topic for a short video on a channel whose entire "
+            "business is: viewers comment a keyword, get a free resource by "
+            "email, and some join a paid community for founders who make "
+            "money with AI. A topic is only worth picking if a solo operator "
+            "can DO something with it this week: a tool to use, a repo to "
+            "deploy, a model with a concrete use case, a workflow to copy, "
+            "a price collapse that changes what is viable.\n"
+            "HARD REJECT, regardless of how big the story is, unless it "
+            "carries a direct operator action: executive moves or poaching, "
+            "hiring news, funding rounds, valuations, lawsuits, courts, "
+            "regulation, politics, layoffs, stock moves, opinion pieces, "
+            "corporate drama.\n"
+            "NEWS beats GitHub repos (repos have their own daily show); only "
+            "pick a repo if it is genuinely the most useful story today.\n"
+            "Return ONLY JSON: "
+            '{"index": <0-based index>, "topicName": "<display name>", '
+            '"keyword": "<the exact search phrase to own>", '
+            '"play": "<one sentence: the concrete thing an operator does '
+            'with this to make or save money this week>"} '
+            'or, if EVERY candidate fails the test: {"reject_all": true}'
+            "\n\nCandidates:\n" + json.dumps(
+                [{"i": i, "title": c["title"], "score": c["score"],
+                  "source": c["source"]} for i, c in enumerate(top)], indent=1))
+        if sel.get("reject_all"):
+            # no operator-usable news today: fall back to the most useful
+            # thing on the menu (utility launches / repos) instead of drama.
+            useful = [c for c in top if UTILITY.search(c["title"])
+                      and not CORP_NEWS.search(c["title"])] or top
+            pick = useful[0]
+            print("judge rejected all news candidates; falling back to:",
+                  pick["title"][:80])
+        else:
             pick = top[int(sel["index"])]
             topic_name, keyword = sel["topicName"], sel["keyword"]
-        except Exception as e:
-            print("LLM topic pick failed, using top score:", e)
+            play = sel.get("play")
+    except Exception as e:
+        print("LLM topic pick failed, using top score:", e)
     if not topic_name:
         vendors = sorted(tokens(pick["title"]) & set(VENDOR_WORDS))
         if vendors:
@@ -292,6 +332,7 @@ def main():
     json.dump({"date": args.date, "mode": "topic",
                "picks": [{"name": topic_name, "keyword": keyword,
                           "headline": pick["title"], "url": pick["url"],
+                          "play": play or "",
                           "stats": stats,
                           "sources": [{"title": c["title"], "source": c["source"],
                                        "score": c["score"]} for c in related]}]},
