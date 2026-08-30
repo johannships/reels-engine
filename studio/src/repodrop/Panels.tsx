@@ -135,11 +135,21 @@ export const RDCard: React.FC<{cues: RDCue[]; title: string; items?: string[];
   );
 };
 
-/** shot — a real screenshot in a browser chrome. */
-export const RDShot: React.FC<{cues: RDCue[]; image: string; label?: string}> = ({cues,image,label}) => (
+/** shot — a real screenshot in a browser chrome, never static.
+ * A static screenshot froze 11.6s of a 26s video (freezedetect QA fail,
+ * 2026-08-30). Motion is duration-agnostic: constant-rate scroll + zoom,
+ * both capped, so any scene length stays alive without over-drifting. */
+export const RDShot: React.FC<{cues: RDCue[]; image: string; label?: string}> = ({cues,image,label}) => {
+  const f = useCurrentFrame();
+  const {fps} = useVideoConfig();
+  const enter = spring({frame: f, fps, config: {damping: 200}});
+  const zoom = 1 + Math.min(f / (fps * 15), 1) * 0.07;   // +7% over 15s, then hold
+  const scroll = -Math.min((f / fps) * 14, 130);          // 14px/s page-scroll, capped
+  return (
   <Ground bg={RD.dark}>
     <div style={{position:'absolute',left:60,right:60,top:200,borderRadius:20,overflow:'hidden',
-      border:`1px solid ${RD.line}`,background:'#0B0B0D'}}>
+      border:`1px solid ${RD.line}`,background:'#0B0B0D',
+      opacity: enter, transform:`translateY(${(1-enter)*40}px)`}}>
       <div style={{height:52,borderBottom:`1px solid ${RD.line}`,display:'flex',alignItems:'center',
         padding:'0 20px',gap:8}}>
         {['#FF5F57','#FEBC2E','#28C840'].map(c=>(<div key={c} style={{width:12,height:12,
@@ -147,11 +157,16 @@ export const RDShot: React.FC<{cues: RDCue[]; image: string; label?: string}> = 
         {label && <span style={{marginLeft:14,fontFamily:RD_MONO,fontSize:20,
           color:RD.muted}}>{label}</span>}
       </div>
-      <Img src={image} style={{width:'100%',display:'block'}}/>
+      <div style={{overflow:'hidden'}}>
+        <Img src={image} style={{width:'100%',display:'block',
+          transform:`translateY(${scroll}px) scale(${zoom})`,
+          transformOrigin:'top center'}}/>
+      </div>
     </div>
     <RDCaption cues={cues} color="#fff" y={0.62}/>
   </Ground>
-);
+  );
+};
 
 /** cta */
 export const RDCta: React.FC<{cues: RDCue[]; badge?: string; line1?: string; line2?: string}> =
