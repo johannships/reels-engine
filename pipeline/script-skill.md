@@ -25,13 +25,39 @@ opportunity."
 
 ## 1. THE HOOK (the first sentence decides everything)
 
-A great hook = a HARD FACT + a REASON TO STAY. Two moves, one breath.
+A hook has exactly ONE job: help the right viewer decide to keep watching.
+It must deliver two things: TOPIC CLARITY (within 2 seconds the viewer
+knows what this is about) and ON-TARGET CURIOSITY (they believe it is for
+THEM, and an open question pulls them forward). Both, or it is not done.
 
-**Move 1 — the viewer's stake.** The first three words decide everything:
-you/your, a brand name, an imperative (Stop / Steal / Delete), or "I" plus
-a money number. Open with what the viewer gains or loses, never with what
-happened in the news. Never a greeting, never a question, never
-context-setting, never "just dropped/launched/changed".
+**The Four Hook Killers — every weak hook fails one of these. Audit
+against all four before shipping:**
+
+1. **DELAY** — topic arrives too late. Delete everything before the topic;
+   the first noun phrase carries the subject. No greeting, no
+   throat-clearing, no "let me explain".
+2. **CONFUSION** — the line takes two passes to parse. Fewer words,
+   simpler words, active voice, one idea per sentence.
+3. **IRRELEVANCE** — clear, but not for ME. Swap me/my for you/your; frame
+   around a pain the viewer already feels. "[Company] just launched
+   [thing]" is a news report: no angle, no stakes for the viewer — banned.
+   An I-framed hook is allowed only when the pain is unmistakably the
+   viewer's too and a you-pivot lands within the first beat.
+4. **DISINTEREST** — clear, relevant, still skippable. The cure is
+   CONTRAST: the gap between what the viewer believes (A) and what you
+   claim (B) IS the curiosity. Stated ("Most people fix this with X. I
+   delete the plan entirely.") or implied (only B stated). The contrast
+   must be EARNED: B must be a concrete instance, number, or mechanism —
+   never hollow significance like "it's about mindset".
+
+**First three words** still decide it: you/your, a brand name, an
+imperative (Stop / Steal / Delete), or "I" plus a money number.
+
+**Banned openers:** "let me explain", "story time", "POV:" with nothing in
+the same breath, "nobody talks about this" without naming the thing,
+"[Company] just launched/dropped/changed", "the shift happening in
+[industry]", any CTA as the opener, "you won't believe", greetings,
+rhetorical questions.
 
 **Move 2 — the reason to stay.** Depends on the format:
 
@@ -72,6 +98,16 @@ screenshot. No screenshot-able line = filler = replace it.
 
 Payoff discipline: whatever the hook promised must LAND as the strongest
 moment in the script. An unpaid promise is a scam; viewers feel it.
+
+**The dance (holds the watch after the hook):** between every beat the
+connector is BUT or THEREFORE, never "and then". "And then" piles detail
+with no tension; but/therefore keeps a loop open. If "and then" fits
+between two beats, the second beat is boring — rewrite it.
+
+**The last dab:** the line right before the CTA should be the most
+shareable line in the script — memorable enough that someone who heard
+only that line would repeat it. Short-form loops, so it also hands off
+into the hook on replay.
 
 ## 3. LANGUAGE (this is spoken aloud by a voice clone)
 

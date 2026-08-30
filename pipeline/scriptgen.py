@@ -95,7 +95,7 @@ Proven hooks from this exact channel (match the energy, never copy):
 "These 3 AI tools get your business leads on autopilot."
 """
 
-def cta_line(idx=0):
+def cta_line(kind=None, idx=0):
     """The spoken CTA, resolved against the channel funnel. ctaRotation entries
     may carry {keyword}/{magnet} placeholders so committed config stays neutral
     while the real keyword lives in config.local.json. A follow-CTA earns
@@ -106,11 +106,16 @@ def cta_line(idx=0):
     # magnet is written copy (may carry parentheticals); the CTA is SPOKEN.
     # Prefer an explicit funnel.magnetSpoken, else strip parentheticals and
     # clamp to something a voice can land in one breath.
-    spoken = f.get("magnetSpoken")
+    keyword = f.get("commentKeyword", "SYSTEM")
+    magnet = f.get("magnet", "the full breakdown")
+    if kind == "repos" and f.get("repoKeyword"):
+        # the daily repo show has its own ManyChat flow and vault page
+        keyword, magnet = f["repoKeyword"], f.get("repoMagnet", magnet)
+    spoken = f.get("magnetSpoken") if kind != "repos" else None
     if not spoken:
-        spoken = re.sub(r"\s*\([^)]*\)", "", f.get("magnet", "the full breakdown"))
+        spoken = re.sub(r"\s*\([^)]*\)", "", magnet)
         spoken = " ".join(spoken.split()[:9]).rstrip(",.")
-    return (line.replace("{keyword}", f.get("commentKeyword", "SYSTEM"))
+    return (line.replace("{keyword}", keyword)
                 .replace("{magnet}", spoken))
 
 def build_prompt(research):
@@ -201,7 +206,7 @@ Write today's "Repo Radar" script covering exactly these {len(picks)} GitHub rep
 STRUCTURE (hard rules):
 - Scene 1 HOOK: max {s['hookMaxWords']} words. Obey the HOOK DOCTRINE above. No greeting.
 - Scenes 2-{1 + len(picks)}: one per repo, {s['wordsPerItem']['min']}-{s['wordsPerItem']['max']} words each. MUST open with the words "First," / "Second," / "Third," respectively (caption alignment depends on it). Each: what it does in one concrete sentence, the star number as a spoken receipt, then the operator angle (who makes money with it and how).
-- Final scene CTA: exactly this line: "{cta_line()}"
+- Final scene CTA: exactly this line: "{cta_line('repos')}"
 - Target total: {s['totalTargetSec'][0]}-{s['totalTargetSec'][1]} seconds at ~150 wpm. Shorter beats longer; people scroll.
 - Banned words/phrases: {", ".join(s['bannedPhrases'])}. No em dashes.
 - Write numbers as words where the voice clone might stumble ("nineteen hundred", "fourteen thousand").
@@ -430,9 +435,16 @@ Non-negotiables:
   sentence that sounds like a filled-in template or references something
   that doesn't exist in THIS video (e.g. "number one" in a video with no
   list). Rewrite in plain speech a founder would actually say to a friend.
-- Hook: hard fact in sentence one + a reason to stay that FITS THE FORMAT
-  (numbered loop ONLY for list videos; single-topic videos tease the payoff
-  or let the fact carry). Exactly one bold claim, never two mashed.
+- HOOK AUDIT (mandatory, run it BEFORE anything else): score scene 1
+  against the Four Killers — DELAY (topic too late), CONFUSION (two passes
+  to parse), IRRELEVANCE (no viewer stake; news-report framing), and
+  DISINTEREST (no earned A-vs-B contrast). If ANY killer flags, rewrite
+  scene 1 from scratch; do not patch words. A reason to stay must FIT THE
+  FORMAT (numbered loop ONLY for list videos). Exactly one bold claim.
+- The beat connectors must be BUT or THEREFORE, never "and then"; if a
+  beat connects with "and then", rewrite that beat.
+- The line before the CTA is the last dab: the single most shareable line
+  in the script. If it is not, promote or write one.
 - Every beat: a concrete fact, then the money/value line. Cite a number
   ONLY if it impresses an outsider on its own; never speak GitHub star
   counts under ten thousand, Hacker News points, or upvotes. A weak number
