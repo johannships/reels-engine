@@ -435,12 +435,16 @@ Non-negotiables:
   sentence that sounds like a filled-in template or references something
   that doesn't exist in THIS video (e.g. "number one" in a video with no
   list). Rewrite in plain speech a founder would actually say to a friend.
-- HOOK AUDIT (mandatory, run it BEFORE anything else): score scene 1
-  against the Four Killers — DELAY (topic too late), CONFUSION (two passes
-  to parse), IRRELEVANCE (no viewer stake; news-report framing), and
-  DISINTEREST (no earned A-vs-B contrast). If ANY killer flags, rewrite
-  scene 1 from scratch; do not patch words. A reason to stay must FIT THE
-  FORMAT (numbered loop ONLY for list videos). Exactly one bold claim.
+- HOOK AUDIT (mandatory, run it BEFORE anything else). Score scene 1 on:
+  (a) the 10-WORD RULE — cover everything after word ten; if a scroller
+  does not NEED the next sentence, it fails; (b) EVENT OVER ADVICE — any
+  "should"/"needs to"/"stop doing" assertion without an event behind it
+  fails; the hook must state something that happened or is; (c) the Four
+  Killers — DELAY, CONFUSION, IRRELEVANCE (news-report framing), and
+  DISINTEREST (no earned contrast); (d) at least ONE of the five curiosity
+  engines from THE CRAFT is running. ANY failure: rewrite scene 1 from
+  scratch, do not patch words. A reason to stay must FIT THE FORMAT
+  (numbered loop ONLY for list videos). Exactly one bold claim.
 - The beat connectors must be BUT or THEREFORE, never "and then"; if a
   beat connects with "and then", rewrite that beat.
 - The line before the CTA is the last dab: the single most shareable line
@@ -506,28 +510,48 @@ def main():
         shots = [f for f in ("shot.jpg", "shot2.jpg")
                  if os.path.exists(os.path.join(epdir, f))
                  and os.path.getsize(os.path.join(epdir, f)) > 20_000]
+        def halves(text):
+            """Split a beat at its middle sentence boundary so it can span
+            two scene types. One 12s block on one visual is the exact
+            static look the repo-drop style exists to avoid."""
+            parts = re.split(r"(?<=[.!?]) +", text.strip())
+            if len(parts) < 2:
+                return text, ""
+            mid = (len(parts) + 1) // 2
+            return " ".join(parts[:mid]), " ".join(parts[mid:])
+
         for i, beat in enumerate(out["beats"]):
             key = (key_texts[i] if i < len(key_texts) else "")[:28]
+            a, b = halves(beat)
             if i == 0:
-                # beat 1 visual priority: real page > real stat card > kinetic type
-                if shots:
-                    scenes.append({"type": "shot", "durationSec": 12,
-                                   "image": shots[0], "label": label, "text": beat})
-                elif stats:
+                # beat 1 fully off-face, two visuals: card then receipt
+                if stats:
                     st = stats[0]
-                    scenes.append({"type": "topic", "durationSec": 12,
+                    scenes.append({"type": "topic", "durationSec": 6,
                                    "name": p["name"],
                                    "desc": out.get("desc", p["headline"])[:90],
                                    "stat": st["value"], "statLabel": st["label"],
                                    "pill": st.get("pill", "trending today"),
-                                   "text": beat})
+                                   "text": a})
                 else:
-                    scenes.append({"type": "kinetic", "durationSec": 12,
-                                   "keyText": key or p["name"], "text": beat})
+                    scenes.append({"type": "kinetic", "durationSec": 6,
+                                   "keyText": key or p["name"], "text": a})
+                if b:
+                    if shots:
+                        scenes.append({"type": "shot", "durationSec": 6,
+                                       "image": shots[0], "label": label,
+                                       "text": b})
+                    else:
+                        scenes.append({"type": "kinetic", "durationSec": 6,
+                                       "keyText": (key or p["name"]), "text": b})
             else:
-                # the play: back on camera WITH the money phrase punched in
-                scenes.append({"type": "avatar", "durationSec": 12, "text": beat,
+                # the play: short beat on camera, then the money phrase as a
+                # full kinetic card so the frame keeps moving
+                scenes.append({"type": "avatar", "durationSec": 6, "text": a,
                                "overlayText": key})
+                if b:
+                    scenes.append({"type": "kinetic", "durationSec": 6,
+                                   "keyText": key or "THE PLAY", "text": b})
     else:
         picks_by_repo = {p["repo"]: p for p in research["picks"]}
         for item in out["items"]:

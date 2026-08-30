@@ -72,7 +72,7 @@ const AvatarOverlay: React.FC<{cues: RDCue[]; overlayText?: string}> = ({cues, o
           transform: `translateY(${(1 - enter) * 24}px)`}}>
           <span style={{fontFamily: RD_SANS, fontWeight: 900, fontSize: 92,
             lineHeight: 1.02, color: '#fff', textTransform: 'uppercase',
-            textShadow: '0 3px 24px rgba(0,0,0,0.85), 0 1px 4px rgba(0,0,0,0.9)'}}>
+            textShadow: '-4px -4px 0 #000, 4px -4px 0 #000, -4px 4px 0 #000, 4px 4px 0 #000, -4px 0 0 #000, 4px 0 0 #000, 0 -4px 0 #000, 0 4px 0 #000, 0 6px 22px rgba(0,0,0,0.7)'}}>
             {overlayText}
           </span>
         </div>
@@ -82,7 +82,7 @@ const AvatarOverlay: React.FC<{cues: RDCue[]; overlayText?: string}> = ({cues, o
           textAlign: 'center'}}>
           <span style={{display: 'inline-block', fontFamily: RD_SANS,
             fontWeight: 800, fontSize: 64, lineHeight: 1.05, color: '#fff',
-            textShadow: '0 3px 18px rgba(0,0,0,0.85), 0 1px 3px rgba(0,0,0,0.9)',
+            textShadow: '-4px -4px 0 #000, 4px -4px 0 #000, -4px 4px 0 #000, 4px 4px 0 #000, -4px 0 0 #000, 4px 0 0 #000, 0 -4px 0 #000, 0 4px 0 #000, 0 6px 22px rgba(0,0,0,0.7)',
             transform: `scale(${pop})`}}>
             {cue.text}
           </span>
