@@ -493,6 +493,12 @@ def main():
     out = refine(research, out)
 
     # Renderer scene list (durations get replaced by real Whisper timings in prep.py)
+    # The CTA is the funnel; a paraphrased keyword breaks ManyChat matching.
+    # The model drifted from the verbatim line once, so enforce it in code.
+    if research.get("mode") in ("topic", "breakout"):
+        out["cta"] = cta_line()
+    else:
+        out["cta"] = cta_line("repos")
     scenes = [{"type": "intro", "durationSec": 4, "text": out["hook"]}]
     if research.get("mode") == "topic":
         p = research["picks"][0]

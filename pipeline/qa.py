@@ -138,9 +138,13 @@ def check_caption_sync(path, epdir, report):
     heard = np.diff(np.clip(db, -60, 0), prepend=db[0])
     heard = np.clip(heard, 0, None)
 
+    # words.json is measured on the UNSPED audio; the final file is sped by
+    # video.speed (atempo). Compare in the final's timebase or a real 1.08x
+    # render reads as a spurious ~0.9s "lag" (timebase scale, not sync).
+    speed = float(CFG.get("video", {}).get("speed", 1.0) or 1.0)
     caption = np.zeros(n)
     for w in words:
-        i0 = int((w["offsets"]["from"] / 1000) / 0.02)
+        i0 = int((w["offsets"]["from"] / 1000 / speed) / 0.02)
         if 0 <= i0 < n:
             caption[i0] = 1.0
 
