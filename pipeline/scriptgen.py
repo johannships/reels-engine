@@ -530,7 +530,15 @@ def main():
             key = (key_texts[i] if i < len(key_texts) else "")[:28]
             a, b = halves(beat)
             if i == 0:
-                # beat 1 fully off-face, two visuals: card then receipt
+                # beat 1 fully off-face, two visuals: card then receipt.
+                # The stat card obeys the same weak-number rule as speech: a
+                # giant "49 STARS TODAY" card kills credibility on sight.
+                def impressive(st):
+                    try:
+                        return float(re.sub(r"[^\d.]", "", str(st.get("value")))) >= 10_000
+                    except ValueError:
+                        return False
+                stats = [st for st in stats if impressive(st)]
                 if stats:
                     st = stats[0]
                     scenes.append({"type": "topic", "durationSec": 6,
