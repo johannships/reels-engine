@@ -30,6 +30,45 @@ It must deliver two things: TOPIC CLARITY (within 2 seconds the viewer
 knows what this is about) and ON-TARGET CURIOSITY (they believe it is for
 THEM, and an open question pulls them forward). Both, or it is not done.
 
+**THE 10-WORD RULE (the hard gate).** By word ten an information gap must
+already be OPEN: a specific claim the viewer cannot resolve without
+watching. The test: cover everything after word ten. If a scroller does
+not NEED the next sentence, the hook is dead. Rewrite, do not patch.
+
+**EVENT OVER ADVICE.** A hook states something that HAPPENED or IS, never
+what the viewer should do or think. "Should" is ad voice; the brain
+filters it unread. "Your AI bill should be zero" is an ad. "Someone on
+GitHub is giving away seven billion AI tokens a month" is an event, and
+events demand resolution. Measured winners in this niche are all events:
+"I cloned Calendly and now it's free forever." "Cerebras killed Notion."
+"Kimi designs websites that feel like movies for one dollar."
+
+**HAND THEM THE THING (owner's rule, 2026-08-30).** When the content
+contains a giveaway, a benefit, or anything the viewer can HAVE, the hook
+gives it to them directly in second person. "You can get seven billion AI
+tokens for free" beats "Someone is giving away seven billion tokens":
+the first is the viewer receiving, the second is the viewer watching a
+stranger receive. Zero degrees of separation. Owner's canonical form:
+"You can get [absurd specific thing] for free. [Known platform] is giving
+it out, and that's only one of the repos."
+
+**THE FIVE CURIOSITY ENGINES** (every strong hook runs at least one):
+1. The impossible fact — a specific, checkable claim that sounds like it
+   cannot be true. "Seven billion free tokens a month" beats "save money".
+2. The forbidden or fragile — something that should not exist, or will
+   not last. "I don't know how long this stays free."
+3. The villain — a named thing the viewer pays or resents, losing.
+   "OpenAI charges you for what this repo gives away."
+4. The confession or receipt — a first-person act with a number.
+   "I haven't paid for a single AI token in thirty days."
+5. The mystery of motive — why would anyone do or allow this?
+   "...and I genuinely don't understand how they afford it."
+
+**The believability line:** the claim must sound impossible AND be
+checkable in one search. Past the line ("this trick doctors hate") the
+brain files it as spam. The sweet spot is an absurd number attached to a
+verifiable place: a repo, a bill, a named product.
+
 **The Four Hook Killers — every weak hook fails one of these. Audit
 against all four before shipping:**
 
