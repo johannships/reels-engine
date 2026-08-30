@@ -1,7 +1,7 @@
 import React from 'react';
-import {AbsoluteFill, Sequence, useVideoConfig} from 'remotion';
+import {AbsoluteFill, Sequence, useVideoConfig, useCurrentFrame, spring} from 'remotion';
 import type {EpisodeProps, Scene, KaraokeWord} from '../types';
-import {RD_CARD} from './theme';
+import {RD_CARD, RD_SANS} from './theme';
 import type {RDCue} from './Caption';
 import {RDIntro, RDRepo, RDStat, RDCard, RDShot, RDCta} from './Panels';
 
@@ -54,6 +54,44 @@ const CARD_MASK =
       `rx='${RD_CARD.radius}' ry='${RD_CARD.radius}' fill='black'/></svg>`,
   )}")`;
 
+/** Captions + hook text over the raw avatar footage. Bold sans, hard
+ * shadow for legibility on any background; distinct from the serif
+ * caption used on graphic panels (never both styles at once per scene). */
+const AvatarOverlay: React.FC<{cues: RDCue[]; overlayText?: string}> = ({cues, overlayText}) => {
+  const frame = useCurrentFrame();
+  const {fps} = useVideoConfig();
+  const t = frame / fps;
+  const cue = cues.find((c) => t >= c.start && t < c.end);
+  const pop = cue ? 1 + 0.05 * Math.exp(-(t - cue.start) * 14) : 1;
+  const enter = spring({frame, fps, config: {damping: 200}});
+  return (
+    <AbsoluteFill style={{pointerEvents: 'none'}}>
+      {overlayText && (
+        <div style={{position: 'absolute', left: 60, right: 60, top: '14%',
+          textAlign: 'center', opacity: enter,
+          transform: `translateY(${(1 - enter) * 24}px)`}}>
+          <span style={{fontFamily: RD_SANS, fontWeight: 900, fontSize: 92,
+            lineHeight: 1.02, color: '#fff', textTransform: 'uppercase',
+            textShadow: '0 3px 24px rgba(0,0,0,0.85), 0 1px 4px rgba(0,0,0,0.9)'}}>
+            {overlayText}
+          </span>
+        </div>
+      )}
+      {cue && (
+        <div style={{position: 'absolute', left: 50, right: 50, top: '70%',
+          textAlign: 'center'}}>
+          <span style={{display: 'inline-block', fontFamily: RD_SANS,
+            fontWeight: 800, fontSize: 64, lineHeight: 1.05, color: '#fff',
+            textShadow: '0 3px 18px rgba(0,0,0,0.85), 0 1px 3px rgba(0,0,0,0.9)',
+            transform: `scale(${pop})`}}>
+            {cue.text}
+          </span>
+        </div>
+      )}
+    </AbsoluteFill>
+  );
+};
+
 const SceneView: React.FC<{scene: Scene; cues: RDCue[]}> = ({scene, cues}) => {
   switch (scene.type) {
     case 'intro':
@@ -73,8 +111,12 @@ const SceneView: React.FC<{scene: Scene; cues: RDCue[]}> = ({scene, cues}) => {
     case 'cta':
       return <RDCta cues={cues} badge={scene.badge} line1={scene.line1} line2={scene.line2} />;
     case 'avatar':
+      // fullscreen talking head: footage shows through, but muted viewers
+      // still need the words. Bold sans captions lower-third + the scene's
+      // overlayText as big top text (frame one is the feed thumbnail).
+      return <AvatarOverlay cues={cues} overlayText={(scene as {overlayText?: string}).overlayText} />;
     default:
-      return null; // fullscreen talking head — the footage shows through
+      return null;
   }
 };
 
