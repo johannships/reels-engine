@@ -371,6 +371,44 @@ def _call_http(prompt):
     return data
 
 
+def call_llm_text(prompt, system="You answer directly and concisely as plain text."):
+    """Same provider chain as call_llm but returns raw text (no JSON parsing).
+    Used by analyze.py, whose output is a prose style memo."""
+    import shutil, subprocess, tempfile
+    if os.environ.get("ANTHROPIC_API_KEY"):
+        raise LLMError("ANTHROPIC_API_KEY is set; refusing (would bill API).")
+    binary = env("CLAUDE_BIN", "claude")
+    if not shutil.which(binary):
+        raise LLMError(f"'{binary}' not on PATH.")
+    child_env = dict(os.environ)
+    tok = env("CLAUDE_CODE_OAUTH_TOKEN")
+    if tok:
+        child_env["CLAUDE_CODE_OAUTH_TOKEN"] = tok
+    child_env.pop("ANTHROPIC_API_KEY", None)
+    scratch = tempfile.mkdtemp(prefix="llmtext-")
+    chain = [m.strip() for m in env("LLM_MODELS", "fable,opus").split(",") if m.strip()]
+    errors = []
+    for model in chain:
+        proc = subprocess.run(
+            [binary, "-p", prompt, "--model", model, "--system-prompt", system,
+             "--output-format", "json", "--no-session-persistence"],
+            capture_output=True, text=True, timeout=int(env("LLM_TIMEOUT_SEC", "180")),
+            stdin=subprocess.DEVNULL, env=child_env, cwd=scratch)
+        if proc.returncode != 0:
+            errors.append(f"{model}: exit {proc.returncode}")
+            continue
+        try:
+            envelope = json.loads(proc.stdout)
+        except json.JSONDecodeError:
+            errors.append(f"{model}: no JSON envelope")
+            continue
+        if envelope.get("is_error"):
+            errors.append(f"{model}: {str(envelope.get('result'))[:150]}")
+            continue
+        return envelope.get("result") or ""
+    raise LLMError("all models failed: " + "; ".join(errors))
+
+
 def call_llm(prompt):
     provider = env("LLM_PROVIDER", "claude-cli").strip().lower()
     if provider in ("claude-cli", "claude", "cli"):

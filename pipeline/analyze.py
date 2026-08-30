@@ -66,17 +66,11 @@ def load_episode_meta():
 
 
 def call_llm(prompt):
-    base = env("LLM_BASE_URL", "https://api.z.ai/api/anthropic").rstrip("/")
-    key, model = env("LLM_API_KEY"), env("LLM_MODEL")
-    if not key or not model:
-        raise SystemExit("Set LLM_API_KEY and LLM_MODEL in pipeline/.env")
-    body = json.dumps({"model": model, "max_tokens": 900,
-                       "messages": [{"role": "user", "content": prompt}]}).encode()
-    req = urllib.request.Request(base + "/v1/messages", data=body, headers={
-        "content-type": "application/json", "x-api-key": key,
-        "authorization": f"Bearer {key}", "anthropic-version": "2023-06-01"})
-    resp = json.loads(urllib.request.urlopen(req, timeout=120).read())
-    return "".join(b.get("text", "") for b in resp.get("content", []))
+    """Delegates to the shared subscription-authenticated provider in
+    scriptgen (the private z.ai HTTP client here kept 429ing after that
+    subscription lapsed, which crashed every Sunday analyze run)."""
+    from scriptgen import call_llm_text
+    return call_llm_text(prompt)
 
 
 def main():

@@ -284,7 +284,7 @@ def main():
             check_loudness(path, report),
             check_black_freeze(path, report),
             check_captions(epdir, report),
-            check_caption_sync(video, epdir, report),
+            check_caption_sync(path, epdir, report),
             check_face_fullscreen(path, windows, report),
         ]
     else:
@@ -293,7 +293,7 @@ def main():
             check_loudness(path, report),
             check_black_freeze(path, report),
             check_captions(epdir, report),
-            check_caption_sync(video, epdir, report),
+            check_caption_sync(path, epdir, report),
             check_seam(path, dur, report),
             check_face(path, dur, report),
         ]
