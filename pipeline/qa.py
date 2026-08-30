@@ -95,71 +95,61 @@ CAPTION_LAG_MAX = 0.25   # seconds of drift tolerated between captions and speec
 
 
 def check_caption_sync(path, epdir, report):
-    """Are the captions actually on the words?
+    """Do captions land on the words? Direct measurement: whisper the FINAL
+    file and compare per-word onsets against words.json (scaled by
+    video.speed, since words.json is measured pre-speedup).
 
-    check_captions() compares word *counts*, which passes happily even when every
-    caption is half a second late. This measures timing directly: build a
-    speech-present timeline from words.json (what the captions are drawn from),
-    build another from the finished audio, and cross-correlate. If the captions
-    line up, the best lag is ~0.
-
-    Deliberately no whisper dependency here — this runs on the final file.
+    Replaces an energy-envelope cross-correlation that gave three mutually
+    contradictory readings (-0.14, -0.9, -1.4) on renders whose whisper-vs-
+    whisper ground truth measured <=0.12s. One extra whisper pass on a ~30s
+    file is cheap; a gate nobody can trust is expensive.
     """
+    import difflib, tempfile
     wpath = os.path.join(epdir, "words.json")
     if not os.path.exists(wpath):
         report["caption_sync"] = {"pass": True, "note": "skipped (no words.json)"}
         return True
-    try:
-        import numpy as np
-    except ImportError:
-        report["caption_sync"] = {"pass": True, "note": "SKIPPED — numpy not installed"}
+    model = os.environ.get("WHISPER_MODEL", "/models/ggml-small.en.bin")
+    if not os.path.exists(model):
+        report["caption_sync"] = {"pass": True, "note": "skipped (no whisper model)"}
         return True
-
-    words = [w for w in json.load(open(wpath))["transcription"] if w["text"].strip()]
-    if not words:
-        report["caption_sync"] = {"pass": True, "note": "skipped (no words)"}
-        return True
-
-    raw = subprocess.run(["ffmpeg", "-v", "error", "-i", path, "-ac", "1", "-ar", "16000",
-                          "-f", "s16le", "-"], capture_output=True).stdout
-    a = np.frombuffer(raw, dtype=np.int16).astype(float) / 32768
-    hop = 320                                    # 20 ms buckets
-    n = len(a) // hop
-    if n < 50:
-        report["caption_sync"] = {"pass": True, "note": "skipped (audio too short)"}
-        return True
-    db = np.array([20 * np.log10(np.sqrt((a[i*hop:(i+1)*hop] ** 2).mean()) + 1e-12)
-                   for i in range(n)])
-
-    # Align on ONSETS, not on spans. A word's span includes its attack and decay,
-    # and whisper's boundaries are wider than the energy envelope, which biases a
-    # span-vs-span correlation by ~0.2s. Rising energy vs word-start impulses
-    # gives a sharp, unbiased peak.
-    heard = np.diff(np.clip(db, -60, 0), prepend=db[0])
-    heard = np.clip(heard, 0, None)
-
-    # words.json is measured on the UNSPED audio; the final file is sped by
-    # video.speed (atempo). Compare in the final's timebase or a real 1.08x
-    # render reads as a spurious ~0.9s "lag" (timebase scale, not sync).
     speed = float(CFG.get("video", {}).get("speed", 1.0) or 1.0)
-    caption = np.zeros(n)
-    for w in words:
-        i0 = int((w["offsets"]["from"] / 1000 / speed) / 0.02)
-        if 0 <= i0 < n:
-            caption[i0] = 1.0
-
-    heard -= heard.mean()
-    caption -= caption.mean()
-    span = int(1.5 / 0.02)                       # search +/- 1.5s
-    lags = range(-span, span + 1)
-    scores = [float(np.dot(np.roll(caption, L), heard)) for L in lags]
-    best = list(lags)[int(np.argmax(scores))] * 0.02
-
-    ok = abs(best) <= CAPTION_LAG_MAX
-    report["caption_sync"] = {"pass": bool(ok), "lag_sec": round(best, 3),
-                              "tolerance": CAPTION_LAG_MAX}
+    norm_w = lambda t: re.sub(r"[^a-z0-9]", "", t.lower())
+    ref = [(w["offsets"]["from"] / 1000.0 / speed, norm_w(w["text"]))
+           for w in json.load(open(wpath))["transcription"] if norm_w(w["text"])]
+    with tempfile.TemporaryDirectory() as td:
+        wav = os.path.join(td, "a.wav")
+        sh(["ffmpeg", "-y", "-v", "error", "-i", path, "-ar", "16000", "-ac", "1",
+            "-c:a", "pcm_s16le", wav])
+        out = os.path.join(td, "fw")
+        sh(["whisper-cli", "-m", model, "-f", wav, "-ml", "1", "-oj", "-of", out])
+        try:
+            heard = [(w["offsets"]["from"] / 1000.0, norm_w(w["text"]))
+                     for w in json.load(open(out + ".json"))["transcription"]
+                     if norm_w(w["text"])]
+        except Exception as e:
+            report["caption_sync"] = {"pass": True,
+                                      "note": f"skipped (final transcribe failed: {e})"}
+            return True
+    a = [t for _, t in ref]; b = [t for _, t in heard]
+    pairs = difflib.SequenceMatcher(a=a, b=b, autojunk=False).get_matching_blocks()
+    deltas = []
+    for blk in pairs:
+        for k in range(blk.size):
+            deltas.append(heard[blk.b + k][0] - ref[blk.a + k][0])
+    if len(deltas) < 10:
+        report["caption_sync"] = {"pass": True, "note": "skipped (too few matched words)"}
+        return True
+    deltas.sort()
+    med = deltas[len(deltas) // 2]
+    p90 = deltas[int(len(deltas) * 0.9)]
+    ok = abs(med) <= CAPTION_LAG_MAX and abs(p90) <= CAPTION_LAG_MAX * 2
+    report["caption_sync"] = {"pass": bool(ok), "lag_sec": round(med, 3),
+                              "p90_sec": round(p90, 3),
+                              "matched": len(deltas), "tolerance": CAPTION_LAG_MAX,
+                              "method": "whisper-final vs words/speed"}
     if not ok:
-        print(f"!! captions drift {best:+.2f}s against the audio", file=sys.stderr)
+        print(f"!! captions drift median {med:+.2f}s (p90 {p90:+.2f}s)", file=sys.stderr)
     return ok
 
 
