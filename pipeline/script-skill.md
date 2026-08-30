@@ -27,9 +27,11 @@ opportunity."
 
 A great hook = a HARD FACT + a REASON TO STAY. Two moves, one breath.
 
-**Move 1 — the fact.** Open with the most surprising true thing you have.
-A number, a name, a "this just happened." Never a greeting, never a
-question, never context-setting.
+**Move 1 — the viewer's stake.** The first three words decide everything:
+you/your, a brand name, an imperative (Stop / Steal / Delete), or "I" plus
+a money number. Open with what the viewer gains or loses, never with what
+happened in the news. Never a greeting, never a question, never
+context-setting, never "just dropped/launched/changed".
 
 **Move 2 — the reason to stay.** Depends on the format:
 

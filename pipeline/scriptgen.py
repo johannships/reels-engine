@@ -74,6 +74,27 @@ def title_rules():
 
 
 
+
+HOOK_CRAFT = """HOOK DOCTRINE (scene 1 lives or dies on the FIRST THREE WORDS):
+- The first 3 words must contain one of: you/your (the viewer's stake), a
+  recognizable brand or product name, an imperative (Stop / Steal / Delete),
+  or "I" plus a money number ("I cut my two thousand dollar...").
+- The hook states what the VIEWER gains or loses, never what happened in the
+  news. "Your AI bill is forty percent too high" beats "X just launched".
+- BANNED in scene 1: "just dropped", "just launched", "just changed",
+  "just went", "nobody's talking about", "blowing up right now", greetings,
+  rhetorical questions, and ALL insider metrics (GitHub stars, Hacker News
+  points, upvotes).
+- Numbers in the hook: only a money or outcome number the viewer can feel.
+  If the only available numbers are small or insider, use none at all.
+- Internally draft 5 candidate hooks, judge each by its first three words,
+  and output ONLY the winner as scene 1.
+Proven hooks from this exact channel (match the energy, never copy):
+"These 3 skills replace my 2,000 dollar a month content team." /
+"The best engineers aren't on LinkedIn." / "Stop building AI agents." /
+"These 3 AI tools get your business leads on autopilot."
+"""
+
 def cta_line(idx=0):
     """The spoken CTA, resolved against the channel funnel. ctaRotation entries
     may carry {keyword}/{magnet} placeholders so committed config stays neutral
@@ -109,8 +130,9 @@ Cross-source data (REAL numbers only, do not alter): {json.dumps(p.get('stats', 
 {'' if p.get('stats') else 'NO headline metric exists for this story. Do NOT invent, estimate, or imply any number that is not in the data above. Lead with the named fact instead.'}
 Related coverage: {json.dumps(p.get('sources', []), indent=1)}\n{("THE PLAY (the topic picker chose this topic FOR this operator angle; Scene 3 must be built on it): " + p["play"]) if p.get("play") else ""}
 
+{HOOK_CRAFT}
 STRUCTURE (hard rules — this is the "money play" format, the channel's viral engine):
-- Scene 1 HOOK: max {s['hookMaxWords']} words. Name the topic explicitly (keyword in the first sentence). Urgency + stakes ("just dropped", "just changed", "nobody's talking about").
+- Scene 1 HOOK: max {s['hookMaxWords']} words. Obey the HOOK DOCTRINE above. The TITLE owns the search keyword; the hook owns the viewer. Work the topic name in naturally by scene 2 at the latest.
 - Scene 2: 28-36 words: what actually happened / what it is, with one real number as the receipt.
 - Scene 3: 28-36 words: THE PLAY — the specific thing an operator builds, sells, or automates with this THIS WEEK. Tool-combo how-tos ("use {p['name']} with <tool they already have>") and honest dollar framing ("agencies charge X for this") are this channel's proven best formats. Never end on "this is interesting" — end on what to do.
 - Scene 4 CTA: exactly: "{cta_line()}"
@@ -149,9 +171,10 @@ A repo is BREAKING OUT on GitHub right now and this video needs to own the keywo
 
 {json.dumps(p, indent=1)}
 
+{HOOK_CRAFT}
 STRUCTURE (hard rules):
-- Scene 1 HOOK: max {s['hookMaxWords']} words, urgency-led ("blowing up right now" energy, but factual).
-- Scene 2: the repo, 40-55 words. What it does concretely, the star velocity as a spoken receipt, one specific way an operator makes money with it this week.
+- Scene 1 HOOK: max {s['hookMaxWords']} words. Obey the HOOK DOCTRINE above: the viewer's stake first, the repo's name by scene 2.
+- Scene 2: the repo, 40-55 words. What it does concretely (speak the star velocity only if it clears ten thousand; otherwise skip metrics), one specific way an operator makes money with it this week.
 - Scene 3 CTA: exactly: "{cta_line()}"
 - Target 20-30 seconds total at ~150 wpm.
 - Banned: {", ".join(s['bannedPhrases'])}. No em dashes.
@@ -174,8 +197,9 @@ Write today's "Repo Radar" script covering exactly these {len(picks)} GitHub rep
 
 {json.dumps(picks, indent=1)}
 
+{HOOK_CRAFT}
 STRUCTURE (hard rules):
-- Scene 1 HOOK: max {s['hookMaxWords']} words. Number-led or curiosity-led. No greeting.
+- Scene 1 HOOK: max {s['hookMaxWords']} words. Obey the HOOK DOCTRINE above. No greeting.
 - Scenes 2-{1 + len(picks)}: one per repo, {s['wordsPerItem']['min']}-{s['wordsPerItem']['max']} words each. MUST open with the words "First," / "Second," / "Third," respectively (caption alignment depends on it). Each: what it does in one concrete sentence, the star number as a spoken receipt, then the operator angle (who makes money with it and how).
 - Final scene CTA: exactly this line: "{cta_line()}"
 - Target total: {s['totalTargetSec'][0]}-{s['totalTargetSec'][1]} seconds at ~150 wpm. Shorter beats longer; people scroll.
@@ -371,8 +395,11 @@ Non-negotiables:
 - Hook: hard fact in sentence one + a reason to stay that FITS THE FORMAT
   (numbered loop ONLY for list videos; single-topic videos tease the payoff
   or let the fact carry). Exactly one bold claim, never two mashed.
-- Every beat: fact with real number (as spoken words) then the money/value
-  line. One screenshot-worthy line per beat.
+- Every beat: a concrete fact, then the money/value line. Cite a number
+  ONLY if it impresses an outsider on its own; never speak GitHub star
+  counts under ten thousand, Hacker News points, or upvotes. A weak number
+  is worse than none: translate it to the outcome instead. One
+  screenshot-worthy line per beat.
 - The loop's promised payoff must be the strongest moment in the script.
 - Keep First/Second/Third openers in list videos and the CTA line VERBATIM.
   Other scenes may be rewritten freely, including their openings — but the
