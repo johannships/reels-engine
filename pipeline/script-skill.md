@@ -52,6 +52,15 @@ stranger receive. Zero degrees of separation. Owner's canonical form:
 "You can get [absurd specific thing] for free. [Known platform] is giving
 it out, and that's only one of the repos."
 
+**"HERE'S HOW" BEATS "HERE'S WHAT" (owner, 2026-09-02).** When the payoff is
+a method the viewer can copy, promise the METHOD, not the statistic.
+"Here's how you can get free AI tokens" beats "You can get seven billion AI
+tokens a month for free." Two reasons: "here's how" opens a loop that only
+watching can close, and a number that large reads as fake, so it costs
+belief instead of buying attention. Keep the big number for beat two, where
+the receipt lands after they already trust you. Simple and specific beats
+big and impressive.
+
 **THE FIVE CURIOSITY ENGINES** (every strong hook runs at least one):
 1. The impossible fact — a specific, checkable claim that sounds like it
    cannot be true. "Seven billion free tokens a month" beats "save money".
@@ -137,6 +146,20 @@ screenshot. No screenshot-able line = filler = replace it.
 
 Payoff discipline: whatever the hook promised must LAND as the strongest
 moment in the script. An unpaid promise is a scam; viewers feel it.
+
+**NEVER RUN THE SAME BEAT TEMPLATE TWICE.** The loudest AI tell in a list
+video is not any single sentence, it is three beats built from one slot
+template: name, description, star count, money line, repeated. The ear locks
+on by beat two and the whole thing reads as machine output. Break it on
+purpose:
+- vary where the payoff sits. One beat opens on the money line, one closes
+  on it, one buries it in the middle.
+- vary sentence shape. One beat is two long sentences, the next is four
+  fragments.
+- NEVER recite a metric as its own sentence in more than one beat. "Eighty
+  thousand stars." twice is a template. Fold the number into a line doing
+  other work, or leave it out. Numbers on screen do not need saying aloud.
+- vary the entry. Not every beat starts by naming the thing.
 
 **The dance (holds the watch after the hook):** between every beat the
 connector is BUT or THEREFORE, never "and then". "And then" piles detail

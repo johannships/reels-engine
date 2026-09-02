@@ -120,6 +120,7 @@ def lint_script(out):
     v = []
     for label, text in script_fields(out):
         v.extend(lint(text, label))
+    v.extend(rhythm(out))
     return v
 
 
@@ -139,6 +140,68 @@ def report(violations):
         mark = "!!" if sev == "error" else " ~"
         lines.append(f"  {mark} {rule}: {quote[:80]!r} -> {fix}")
     return "\n".join(lines), len(errs), len(warns)
+
+
+# ── rhythm (anti-template) ───────────────────────────────────────────────
+# A script can pass every STE rule and still sound like a machine, because
+# the TELL is not any single sentence: it is three beats built from the same
+# slot template. "name. description. star count. money line." x3 makes the
+# ear lock on by beat two. Disease 4 in anti-ai-writing: rhythmic flatness.
+
+_NUM_ONLY = re.compile(
+    r"^(over |about |nearly |more than )?[\w\- ]*?"
+    r"(hundred|thousand|million|billion|dozen|[\d,]+)[\w\- ]*"
+    r"(stars?|downloads?|users?|forks?|tokens?|percent)\b[.!]?$", re.I)
+
+
+def _shape(text):
+    """Bucketed sentence-length fingerprint of one beat."""
+    out = []
+    for s in sentences(text):
+        n = len(_words(s))
+        out.append("S" if n <= 5 else ("M" if n <= 11 else "L"))
+    return "".join(out)
+
+
+def rhythm(out):
+    """Cross-beat checks. Returns violations in the same shape as lint()."""
+    beats = [(k, t) for k, t in script_fields(out) if not k.startswith("hook")]
+    if len(beats) < 2:
+        return []
+    v = []
+
+    shapes = [_shape(t) for _, t in beats]
+    if len(set(shapes)) == 1 and len(shapes) >= 2:
+        v.append(("rhythm-template", "error", " / ".join(shapes),
+                  "every beat has the identical sentence shape. Vary it: lead one "
+                  "beat with the payoff, one with a fragment, one with the name."))
+
+    # standalone stat recitations: "Eighty thousand stars." x3 is a template tell
+    recites = []
+    for label, t in beats:
+        for s in sentences(t):
+            if _NUM_ONLY.match(s.strip()):
+                recites.append(f"[{label}] {s.strip()}")
+    if len(recites) >= 2:
+        v.append(("rhythm-recite", "error", "; ".join(recites)[:150],
+                  "stop reciting a metric as its own sentence in every beat. "
+                  "Fold the number into a line that does other work, or drop it."))
+
+    # every beat closing on a long sentence = the same cadence three times
+    closers = [_shape(t)[-1:] for _, t in beats if _shape(t)]
+    if len(closers) >= 3 and len(set(closers)) == 1 and closers[0] == "L":
+        v.append(("rhythm-closer", "warn", "all beats end long",
+                  "land at least one beat on a short punch."))
+
+    # identical opener bigram across beats (beyond the required First/Second/Third)
+    heads = []
+    for label, t in beats:
+        w = _words(re.sub(r"^(First|Second|Third|Fourth)[,.]?\s*", "", t.strip(), flags=re.I))
+        heads.append(" ".join(w[:2]).lower())
+    if len(heads) >= 2 and len(set(heads)) == 1:
+        v.append(("rhythm-opener", "error", heads[0],
+                  "every beat opens the same way. Vary the entry."))
+    return v
 
 
 if __name__ == "__main__":
