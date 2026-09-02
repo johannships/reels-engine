@@ -482,6 +482,81 @@ Return ONLY the final JSON, no commentary."""
     return draft
 
 
+def delint(out):
+    """Deterministic de-slop pass over the SPOKEN fields.
+
+    ste_lint counts and greps; it cannot drift the way an instruction can.
+    Anything it flags is quoted back to the model for one repair round, then
+    re-checked. Remaining violations are printed, never silently accepted.
+
+    The CTA is excluded on purpose: it is overwritten verbatim from config
+    downstream, so linting it would fight the funnel.
+    """
+    import ste_lint
+    before = ste_lint.lint_script(out)
+    errs = [v for v in before if v[1] == "error"]
+    if not errs:
+        print(f"[ste] clean on first pass | {ste_lint.stats(out)}", flush=True)
+        return out
+
+    body, n_err, n_warn = ste_lint.report(before)
+    print(f"[ste] {n_err} errors, {n_warn} warnings before repair:\n{body}", flush=True)
+
+    spoken = {k: t for k, t in ste_lint.script_fields(out)}
+    prompt = f"""Rewrite the spoken lines below to fix every violation listed.
+
+THE LINES (JSON, keys are scene labels):
+{json.dumps(spoken, indent=1)}
+
+VIOLATIONS FOUND (each quotes the offending text):
+{body}
+
+RULES FOR THE REWRITE:
+- Fix every "error". Warnings are advisory, use judgement.
+- Keep EVERY fact, name, and number exactly as written. Never add a number,
+  a claim, or a detail that is not already in the line.
+- These lines are SPOKEN by one person to camera. Keep contractions, keep the
+  rhythm, keep the personality. Short declaratives, not a flight manual.
+- Sentences stay under 20 words. Split long ones instead of compressing them
+  into jargon.
+- Do not weaken the hook. It must still open a curiosity gap in ten words.
+- No em dashes.
+
+Return ONLY JSON with the exact same keys and no others:
+{json.dumps({k: "<rewritten>" for k in spoken}, indent=1)}"""
+
+    try:
+        fixed = call_llm(prompt)
+    except Exception as e:
+        print(f"[ste] repair call failed ({e}); keeping original", flush=True)
+        return out
+
+    # Merge only the spoken fields back; never let a repair drop other keys.
+    for label, text in fixed.items():
+        if not isinstance(text, str) or not text.strip():
+            continue
+        if label == "hook":
+            out["hook"] = text.strip()
+        elif label.startswith("beat") and out.get("beats"):
+            i = int(re.sub(r"\D", "", label) or 0) - 1
+            if 0 <= i < len(out["beats"]):
+                out["beats"][i] = text.strip()
+        elif label.startswith("item") and out.get("items"):
+            i = int(re.sub(r"\D", "", label) or 0) - 1
+            if 0 <= i < len(out["items"]):
+                out["items"][i]["text"] = text.strip()
+
+    after = ste_lint.lint_script(out)
+    rem_err = [v for v in after if v[1] == "error"]
+    if rem_err:
+        body2, n2, _ = ste_lint.report(after)
+        print(f"[ste] {n2} errors REMAIN after repair (shipping anyway):\n{body2}",
+              flush=True)
+    else:
+        print(f"[ste] clean after repair | {ste_lint.stats(out)}", flush=True)
+    return out
+
+
 def main():
     ep = sys.argv[1] if len(sys.argv) > 1 else None
     if not ep:
@@ -491,6 +566,7 @@ def main():
 
     out = call_llm(build_prompt(research))
     out = refine(research, out)
+    out = delint(out)
 
     # Renderer scene list (durations get replaced by real Whisper timings in prep.py)
     # The CTA is the funnel; a paraphrased keyword breaks ManyChat matching.
@@ -591,12 +667,14 @@ def main():
     magnet = (fn.get("repoMagnet") if is_repo_video else None) or fn.get("magnet", "the free toolkit")
     if kw and social.get("caption"):
         cap_lines = social["caption"].rstrip().rsplit("\n", 1)
-        cta_line = f"Comment {kw} and I'll DM you {magnet}."
+        # NOTE: not named comment_cta. That is the module-level function, and a
+        # local assignment here shadows it for the whole of main().
+        comment_cta = f"Comment {kw} and I'll DM you {magnet}."
         # insert the comment-CTA before the hashtag line
         if len(cap_lines) == 2 and cap_lines[1].startswith("#"):
-            social["caption"] = f"{cap_lines[0]}\n{cta_line}\n{cap_lines[1]}"
+            social["caption"] = f"{cap_lines[0]}\n{comment_cta}\n{cap_lines[1]}"
         else:
-            social["caption"] = f"{social['caption'].rstrip()}\n{cta_line}"
+            social["caption"] = f"{social['caption'].rstrip()}\n{comment_cta}"
     social = social or {
         "title": scenes[0]["text"][:90],
         "caption": scenes[0]["text"] + "\n#ai #aiagents #github #buildinpublic #startup #tech",
