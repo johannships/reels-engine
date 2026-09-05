@@ -266,6 +266,17 @@ def main():
     # NOTE: no env gate here. The old `if env("LLM_API_KEY")` check silently
     # skipped the judge after the provider moved to the Claude CLI, so raw
     # HN score picked the topic (that is how exec-poaching news won a slot).
+    craft_ideas = ""
+    try:
+        craft_ideas = open(os.path.join(HERE, "craft", "winning-ideas.md")).read()
+    except Exception:
+        pass
+    recent_verdicts = ""
+    try:
+        rows = open(os.path.join(EPISODES, "decisions.jsonl")).read().strip().splitlines()[-30:]
+        recent_verdicts = "\n".join(rows)
+    except Exception:
+        pass
     try:
         sel = call_llm(
             "You pick ONE topic for a short video on a channel whose entire "
@@ -288,17 +299,25 @@ def main():
             '"play": "<one sentence: the concrete thing an operator does '
             'with this to make or save money this week>"} '
             'or, if EVERY candidate fails the test: {"reject_all": true}'
-            "\n\nCandidates:\n" + json.dumps(
+            + "\n\nWHAT WINS ON THIS CHANNEL (obey; this outranks recency):\n"
+            + craft_ideas
+            + ("\n\nTHE OWNER'S RECENT VERDICTS (post = shipped, skip/redo = "
+               "rejected; learn his taste):\n" + recent_verdicts
+               if recent_verdicts else "")
+            + "\n\nCandidates:\n" + json.dumps(
                 [{"i": i, "title": c["title"], "score": c["score"],
                   "source": c["source"]} for i, c in enumerate(top)], indent=1))
         if sel.get("reject_all"):
-            # no operator-usable news today: fall back to the most useful
-            # thing on the menu (utility launches / repos) instead of drama.
-            useful = [c for c in top if UTILITY.search(c["title"])
-                      and not CORP_NEWS.search(c["title"])] or top
-            pick = useful[0]
-            print("judge rejected all news candidates; falling back to:",
-                  pick["title"][:80])
+            # Editorial kill: nothing on the menu passes the ownership gate.
+            # Shipping the least-bad candidate anyway is how the owner got a
+            # week of competent-but-unwinnable proposals. A quiet day is the
+            # correct output. (Fleet finding, confirmed 2026-09-05.)
+            from watch import notify
+            notify("Topic judge", "No candidate passed the ownership gate "
+                   "today. Nothing proposed. (This is by design; the steal "
+                   "and repo tracks still run.)")
+            print("judge killed the whole menu; no topic episode today")
+            return
         else:
             pick = top[int(sel["index"])]
             topic_name, keyword = sel["topicName"], sel["keyword"]

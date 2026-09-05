@@ -70,6 +70,11 @@ def main():
             state["daily"] = today
             json.dump(state, open(STATE, "w"))
             run("daily.py")
+        steal_h = int(env("STEAL_HOUR", "10"))
+        if now.hour >= steal_h and state.get("steal") != today:
+            state["steal"] = today
+            json.dump(state, open(STATE, "w"))
+            run("steal.py")
         last_watch = state.get("watch", 0)
         if time.time() - last_watch >= watch_every * 3600:
             state["watch"] = time.time()

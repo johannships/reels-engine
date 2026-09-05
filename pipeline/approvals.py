@@ -33,6 +33,21 @@ PENDING = os.path.join(EPISODES, "pending.json")
 FEEDBACK = os.path.join(EPISODES, "feedback.log")
 
 
+DECISIONS = os.path.join(EPISODES, "decisions.jsonl")
+
+
+def log_decision(action, ep, note=""):
+    """Taste capture: every post/skip/redo becomes training signal for the
+    topic judge (topics.py injects the recent tail into its prompt)."""
+    try:
+        with open(DECISIONS, "a") as f:
+            f.write(json.dumps({"at": datetime.datetime.utcnow().isoformat(),
+                                "action": action, "ep": ep,
+                                "note": note[:300]}) + "\n")
+    except Exception:
+        pass
+
+
 def _load():
     try:
         return json.load(open(PENDING))
@@ -140,6 +155,21 @@ def handle_commands():
     for text in updates:
         cmd = text.strip()
         low = cmd.lower()
+        if low.startswith("steal "):
+            url = cmd.split(maxsplit=1)[1].strip()
+            if not url.startswith("http"):
+                telegram.send_text("usage: steal <video-or-reel-url>")
+                continue
+            telegram.send_text("🎯 analyzing that video, proposal in ~2 min...")
+            def _steal(u=url):
+                try:
+                    import steal
+                    steal.propose({"url": u})
+                except Exception as e:
+                    telegram.send_text(f"❌ steal failed: {str(e)[:200]}")
+            import threading
+            threading.Thread(target=_steal, daemon=True).start()
+            continue
         if low == "list":
             items = d["items"]
             telegram.send_text("Pending:\n" + "\n".join(
@@ -155,6 +185,7 @@ def handle_commands():
                 continue
             ok, msg = _schedule(item["ep"], when)
             if ok:
+                log_decision("post", item["ep"])
                 del d["items"][n]
                 telegram.send_text(f"✅ #{n} scheduled. {msg.splitlines()[-1] if msg else ''}")
             else:
@@ -191,6 +222,7 @@ def handle_commands():
                 continue
             ep = item["ep"]
             if note:
+                log_decision("redo", ep, note)
                 with open(FEEDBACK, "a") as f:
                     f.write(f"{datetime.date.today().isoformat()} (redo request"
                             f" for {ep}): {note}\n")
@@ -207,6 +239,8 @@ def handle_commands():
             n = cmd.split()[1] if len(cmd.split()) > 1 else ""
             if n in d["items"]:
                 ep = d["items"].pop(n)["ep"]
+                reason = cmd.split(maxsplit=2)[2] if len(cmd.split(maxsplit=2)) > 2 else ""
+                log_decision("skip", ep, reason)
                 open(os.path.join(EPISODES, ep, "skipped"), "w").write("skipped")
                 telegram.send_text(f"🗑 #{n} skipped — will never post.")
             else:

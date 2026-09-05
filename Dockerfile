@@ -6,7 +6,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       ca-certificates tzdata \
     && rm -rf /var/lib/apt/lists/*
 
-RUN pip3 install --no-cache-dir --break-system-packages opencv-python-headless numpy
+RUN pip3 install --no-cache-dir --break-system-packages opencv-python-headless numpy yt-dlp
 
 # whisper.cpp (word-level caption timestamps) — static build so the binary
 # has no shared-lib dependencies (exit 127 otherwise)
