@@ -1,0 +1,3 @@
+source_id,title,source_type,publisher,publication_date,access_date,url_or_path,authorization,status,notes
+SRC-001,Example product overview page,product-page,Example Product Co,unknown,2026-01-15,https://product.example.com/overview,public,available,"TEMPLATE ROW, replace me. No publication date stated on the page, so publication_date stays unknown. Do not infer a date from the URL or from a search result."
+SRC-002,Example internal launch notes,owned-notes,Project owner,2026-01-10,2026-01-15,input/owned/launch-notes.md,user-provided,partial,"TEMPLATE ROW, replace me. status=partial because only the first two pages were supplied. authorization=user-provided means it can inform strategy; publication safety is decided per claim, not per file."

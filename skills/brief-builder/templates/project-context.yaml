@@ -1,0 +1,74 @@
+# project-context.yaml
+# Shared input contract for the content-research-team suite.
+# All three skills (/signal-scout, /content-strategist, /brief-builder) read this file.
+#
+# Copy it, fill it in, keep it next to your source register.
+# Anything you leave blank is treated as unknown. The skills will say so in their
+# output rather than guessing, because a guessed audience or a guessed offer is the
+# fastest way to produce confident content that is wrong.
+#
+# THIS FILE IS A TEMPLATE. The values below are placeholders, not sample data to reuse.
+
+# Name of the brand, product, or person the content is for.
+project_name: ""
+
+# "real" or "fictional-demo".
+# Set "fictional-demo" for tests, teaching material, and portfolio pieces. Every
+# artifact produced from a fictional-demo project is stamped as sample data so a
+# reader can never mistake an invented metric for a real one.
+project_type: "real"
+
+audience:
+  # One sentence. Who this is actually for, specific enough to exclude people.
+  primary: ""
+  # Problems the audience has stated in your sources, not problems you assume.
+  pains:
+    - ""
+  # What they want to be true after the problem is solved.
+  desired_outcomes:
+    - ""
+
+# What the content is for, in business terms. One sentence.
+# Example: "book qualified demos with SaaS teams under 50 staff".
+business_objective: ""
+
+# Where this content will be published. Used to shape briefs.
+# Allowed: youtube | linkedin | x | newsletter | short-form | blog
+channels:
+  - ""
+
+offer:
+  # What you want people to take up.
+  name: ""
+  # Description you have verified against a source you can cite (a product page,
+  # your own docs). Do not write aspirational copy here. The brief will treat this
+  # as a factual claim and ask for its source.
+  verified_description: ""
+  # Where the CTA sends people.
+  cta_destination: ""
+
+voice:
+  # How the writing should sound. Three to five traits is enough.
+  traits:
+    - ""
+  # Words, formats, and habits to keep out. Be literal.
+  avoid:
+    - ""
+
+constraints:
+  # Market or region the claims must hold for. "global" if genuinely unrestricted.
+  geography: ""
+  # Only evidence inside this window counts as timely. Format: YYYY-MM-DD to YYYY-MM-DD.
+  date_window: ""
+  # Subjects that must not appear at all.
+  excluded_topics:
+    - ""
+  # Subjects usable for internal strategy but never publishable: unannounced
+  # launches, client names, private metrics, anything under embargo.
+  # The skills carry these through to the strategy memo and then exclude them from
+  # the brief and mark them publication_safe=no in the claim ledger.
+  confidential_topics:
+    - ""
+
+# Person who signs off before anything ships. Role is fine, no email needed.
+approval_owner: ""

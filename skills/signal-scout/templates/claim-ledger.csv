@@ -1,0 +1,3 @@
+claim_id,brief_section,claim_text,claim_type,source_ids,source_locator,evidence_class,publication_safe,approval_status,required_action,notes
+CLM-001,6. Beat 2,"The v3.2 release notes list connection pooling as opt-in and off by default.",direct-fact,SRC-004,"Release notes v3.2, heading ""Defaults""",1,yes,approved,,"Primary vendor doc. As of 2026-08-14."
+CLM-002,5. Hook option 2,"Our deploy time fell from 11 min to 4 min after the pooling change.",placeholder,,,n/a,unknown,needs-review,"Pull the before/after build timings from CI and paste the run URLs.","Not yet measured. Do NOT write this as a result until the numbers exist. Hook 2 is blocked on this row."
