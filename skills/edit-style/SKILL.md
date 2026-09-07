@@ -219,8 +219,45 @@ level. A plucked arpeggio over a 4-chord loop puts 91% in the audible band.
    Align on onsets, not word spans; spans bias the result by ~0.2s.
    A good build measures 0.00–0.09s median.
 
+
+## Gesture-anchored graphics (verdict-card / pointing reels)
+
+Learned on the bad/good/great tools reel (Sep 2026), which shipped mirrored
+once. When on-screen graphics are things the speaker POINTS at:
+
+- **Map the pointing direction before placing anything.** Extract a frame at
+  every reveal word and look at where the finger actually is. A right-handed
+  speaker pointing overhead sweeps RIGHT -> MIDDLE -> LEFT from the viewer's
+  side, the mirror of reading order. Never assume left-to-right.
+- **QA gate: finger matches reveal.** After rendering, re-extract a frame at
+  each reveal moment and verify the revealed element is on the side being
+  pointed at. Head-clearance and timing checks do not catch this class.
+- **Every curiosity element starts hidden.** In blur-reveal formats ALL
+  tiles start blurred, each unblurs only at its spoken word (word start
+  minus ~0.12s). A tile that starts sharp kills the hold.
+- **Face-detector outliers can be hands.** A hand raised in front of the
+  face reads as head_top jumping to 20% for one frame. Before shrinking a
+  layout over one outlier measurement, eyeball that frame: hand or head?
+- **Logo sourcing that works:** google s2 favicon service
+  (`google.com/s2/favicons?domain=X&sz=256`) covers most brands with
+  transparency; GitHub org avatars (`github.com/<org>.png?size=460`) as the
+  high-res fallback; wikimedia thumbs are UA-blocked from scripts. White
+  tiles make opaque-white-background logos a non-issue. ALWAYS render a
+  labeled contact sheet of every logo and look at it before compositing --
+  this catches wrong brands and broken files in one glance.
+- **Trim leading dead air by RMS, not by Whisper.** Whisper stamps the first
+  word at 0.00 even when the voice starts at 0.50; measure a 20ms RMS
+  envelope, cut to onset minus ~0.1s, then re-transcribe the trimmed file's
+  first 2s to prove the first word survived.
+
 ## Recurring pitfalls
 
+- **Platform safe zones (shipped cropped once).** Instagram crops reels to
+  4:5 in the feed and lays UI over the edges of the full 9:16 view. Keep ALL
+  critical graphics (cards, labels, text) inside: top >= 220px, bottom
+  <= 1620px, sides >= 60px on a 1080x1920 frame. A card row that starts at
+  y=60 gets its labels cut off on phones. QA gate: check the 4:5 center crop
+  (1080x1350, y 285-1635) still shows every graphic that carries meaning.
 - **Forward panel props generically.** Copying a hardcoded list of prop names
   means a new panel kind silently gets `undefined` and Remotion dies with
   "outputRange must contain only numbers".
