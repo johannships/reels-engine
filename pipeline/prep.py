@@ -304,13 +304,19 @@ def main():
             sc["image"] = f"data:image/jpeg;base64,{b64}"
 
     layout = script.get("layout", "split")
-    # RepoDrop is the default look; set "style": "RepoRadar" in the script to
-    # render an older episode with the previous composition.
-    STYLE = script.get("style", "RepoDrop")
+    # Composition to render. Per-episode "style" in script.json wins, then the
+    # series default in config.json (video.style), then RepoDrop as the
+    # historical fallback. "Trending" is the measured reproduction of the
+    # best-performing reel; "RepoDrop" and "RepoRadar" stay selectable so an
+    # older episode can be re-rendered in the look it was written for.
+    STYLE = script.get("style") or CFG.get("video", {}).get("style") or "RepoDrop"
     props = {
         "date": script["date"], "scenes": scenes, "layout": layout,
         "avatarTransparent": True, "captions": words,
     }
+    if script.get("accentWords"):
+        props["accentWords"] = script["accentWords"]
+    print(f"style: {STYLE}  layout: {layout}")
     props_path = os.path.join(epdir, "props.json")
     json.dump(props, open(props_path, "w"), indent=1)
 

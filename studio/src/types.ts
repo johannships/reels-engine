@@ -123,6 +123,12 @@ export type EpisodeProps = {
    * start. When omitted, placeholder timings are derived from scene text.
    */
   captions?: KaraokeWord[];
+  /**
+   * Extra caption words to render in the accent colour (Trending style).
+   * Numbers, repo names and money words are detected automatically — this is
+   * only for words a specific episode wants to punch that the rules miss.
+   */
+  accentWords?: string[];
 };
 
 export type KaraokeWord = {
