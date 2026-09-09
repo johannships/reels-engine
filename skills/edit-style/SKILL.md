@@ -272,6 +272,19 @@ owner reads them as AI slop. Real Vox / Johnny Harris short-form is:
 
 ## Recurring pitfalls
 
+- **Footage↔audio alignment is a QA gate, not an assumption.** A Remotion
+  `<OffthreadVideo>` inside a `<Sequence from={X}>` restarts at frame 0 unless it
+  has `startFrom={X}` — every shot after the first then shows footage from the
+  wrong time while the audio is right (lips and hands stop matching). Ship-blocking,
+  and invisible to face/safe-zone/caption gates. Gate: match face-box (or hand)
+  trajectories of the finished file against the raw take at 0.1s across the whole
+  timeline; offset must be 0.0 in every shot.
+- **Never cut to moving footage of the speaker from another take.** Their lips
+  move on different words and it reads as a glitch. Cutaways of prior work are
+  freeze-frames with a push-in, cropped toward the graphics.
+- **Count-ups must never display a wrong intermediate value** where the number
+  is a claim (a frame reading "54% automated"). Hard-in claims; animate only
+  decoration.
 - **Platform safe zones (shipped cropped once).** Instagram crops reels to
   4:5 in the feed and lays UI over the edges of the full 9:16 view. Keep ALL
   critical graphics (cards, labels, text) inside: top >= 220px, bottom
