@@ -43,3 +43,18 @@ proposal beats a competent video 50 other channels can also make.
 - Vendor speed/cost news with no operator action ("X tokens/sec on Y").
 - "Company launched product" reframed as how-to without a real test.
 - Any idea whose only receipt is someone else's benchmark.
+
+## The best follower-growth video on record (verified Sep 9 2026)
+
+- **"Three AI repos are blowing up on GitHub today"** (IG reel DaYtkeQleK6, 53s):
+  **5,411 likes, 90 comments, ~5,000 new followers from one video.** HeyGen clone
+  (green background), dark "TRENDING #N" repo card on top (owner/name, one-line
+  description, star count, "+N today" velocity chip), word captions with accent
+  keywords. Script shape: hook "3 AI repos are blowing up today, and #2 is
+  basically a business in a box" -> per repo: what it does in one plain sentence
+  -> the money angle ("agencies charge $5K for this audit") -> star velocity
+  ("1,900 stars today alone") -> CTA "I post the hottest AI repos every day,
+  follow so you don't miss tomorrow's." The velocity number + the "business you
+  can sell tomorrow" framing are the engine. This is the RepoDrop format; the
+  pipeline's studio/src/repodrop panels reproduce it. Remake it whenever GitHub
+  trending has 3 repos with big same-day gains.
