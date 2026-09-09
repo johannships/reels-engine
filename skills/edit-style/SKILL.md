@@ -250,6 +250,26 @@ once. When on-screen graphics are things the speaker POINTS at:
   envelope, cut to onset minus ~0.1s, then re-transcribe the trimmed file's
   first 2s to prove the first word survived.
 
+
+## Editorial / "Vox-style" edits (learned Sep 9 2026, one cut rejected first)
+
+Text panels on a flat color are NOT editorial style; they are slides, and the
+owner reads them as AI slop. Real Vox / Johnny Harris short-form is:
+- real imagery cutaways (screenshots, B-roll, the creator's own prior work) with
+  slow push-ins; text sits ON imagery, never alone on a card
+- "receipt" cards: source masthead + headline / repo + live star count, dropped
+  over the imagery as proof
+- ONE bold sans, white captions, key words in a solid yellow highlighter box;
+  a yellow name lower-third in the first 3s; big stat type over darkened footage
+- punch-ins on the talking head on hard beats; calm 8-12 frame ease-outs;
+  numbers count up, highlighter boxes wipe in
+- when the speaker points and names a graphic, a graphic MUST be there, anchored
+  to the measured hand position (detect the hand; do not guess)
+- build in Remotion (studio/), not Pillow overlays, so everything actually moves
+- numbers: one source of truth, verified via API the day of render; QA every
+  frame of a count-up's life, not one sample (a mid-ramp frame reads as a wrong
+  number)
+
 ## Recurring pitfalls
 
 - **Platform safe zones (shipped cropped once).** Instagram crops reels to
