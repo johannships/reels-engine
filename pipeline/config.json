@@ -71,6 +71,9 @@
     "speed": 1.08,
     "avatarLooks": [],
     "avatarFocusY": 0.4,
+    "_faceComment": "Landscape HeyGen looks are zoomed so the head fills faceTarget of the 960px bottom panel, capped at faceMaxZoom upscale. The reference reel measures 0.81; 0.50 is what today's 236px-tall source face can reach inside a 2.2x cap without going soft. Raise faceTarget for a tighter shot.",
+    "faceTarget": 0.5,
+    "faceMaxZoom": 2.2,
     "loudnormI": -14,
     "voice": {
       "speed": 1.3,

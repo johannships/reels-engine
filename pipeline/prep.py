@@ -191,20 +191,85 @@ def analyze_avatar(avatar_path, meta):
     left, right = left + inset, right - inset
     content = (left, top, max(right - left, 32), max(bottom - top, 32))
 
-    tops, bottoms = [], []
+    tops, bottoms, centres, heights = [], [], [], []
     for f in frames:
         faces = [b for b in facedet.detect(f) if b[2] >= meta["w"] // 10]
         if faces:
             x, y, fw, fh = faces[0]
             tops.append(y)
             bottoms.append(y + fh)
-    face = (min(tops), max(bottoms)) if len(tops) >= 2 else None
+            centres.append(x + fw / 2)
+            heights.append(fh)
+    # The horizontal centre and the height are MEANS (the head drifts a little
+    # between samples and a min/max there would chase the outlier), while top
+    # and bottom stay min/max so the crop can never clip the head.
+    face = {
+        "top": min(tops), "bottom": max(bottoms),
+        "cx": sum(centres) / len(centres),
+        "h": sum(heights) / len(heights),
+    } if len(tops) >= 2 else None
     print(f"content box: x={content[0]} y={content[1]} w={content[2]} h={content[3]} "
-          f"(source {w}x{h}) | face rows: {face}")
+          f"(source {w}x{h}) | face: " +
+          (f"rows {face['top']}-{face['bottom']} cx={face['cx']:.0f} h={face['h']:.0f}"
+           if face else "None"))
     return content, face
 
 
 ANCHORS = ["first", "second", "third", "fourth", "fifth"]
+
+# ── Face framing for LANDSCAPE HeyGen looks ──────────────────────────────
+# Every current HeyGen look (8-13) returns a 1080x1920 file that contains a
+# letterboxed LANDSCAPE band — e.g. a 1068x708 content box at y=606. Scaling
+# that band to merely cover the 1080x960 panel leaves the head at ~33% of the
+# panel with no vertical pan room (the scale is driven by the height term, so
+# rh2 == 960 and off_y clamps to 0). That is why the 2026-09-09 reel had the
+# speaker sitting small and off-centre instead of filling the panel.
+#
+# Measured with YuNet on the reference reel (reels/three-repos/ref.mp4, bottom
+# half, 6 samples): the head box is 704-824px tall at 1080-scale, i.e. a mean
+# 81% of the 960px panel, sitting at headroom 76-122px with the chin 28-135px
+# off the bottom edge. Matching 81% from this source would need a 3.3x upscale
+# of a 236px-tall face, which is too soft to ship — so we aim for a configured
+# fraction of the panel and cap the upscale. Portrait looks are untouched and
+# keep the original "face top 150px below the seam" behaviour.
+LANDSCAPE_RATIO = 1.2       # content boxes wider than this get face-framed
+FACE_TARGET = 0.50          # head-box height as a fraction of the 960px panel
+FACE_MAX_ZOOM = 2.2         # never upscale the source content more than this
+FACE_HEADROOM_FRAC = 0.22   # of the leftover panel height, placed above the head
+FACE_CHIN_MIN = 60          # px of panel that must remain below the chin
+
+
+def frame_landscape_face(content, face, cfg):
+    """Zoom + offsets that make the head fill the bottom panel.
+
+    Returns (zoom, scaled_w, scaled_h, off_x, off_y). The crop window is
+    centred on the head horizontally and placed so the headroom is a fixed
+    fraction of the spare panel height, then clamped so (a) no letterbox can
+    enter the frame and (b) at least FACE_CHIN_MIN px stay below the chin.
+    """
+    cx, cy, cw, ch = content
+    target = float(cfg.get("faceTarget", FACE_TARGET))
+    max_zoom = float(cfg.get("faceMaxZoom", FACE_MAX_ZOOM))
+    cover = max(1080 / cw, 960 / ch)          # floor: below this, bars show
+    zoom = min(max(target * 960 / face["h"], cover), max_zoom)
+    rw, rh = round(cw * zoom), round(ch * zoom)
+
+    face_h = face["h"] * zoom
+    face_top = (face["top"] - cy) * zoom
+    face_bot = (face["bottom"] - cy) * zoom
+    head_x = (face["cx"] - cx) * zoom
+
+    off_y = face_top - FACE_HEADROOM_FRAC * max(960 - face_h, 0)
+    # chin stays inside the panel with margin
+    off_y = max(off_y, face_bot + FACE_CHIN_MIN - 960)
+    off_x = head_x - 540
+    off_y = min(max(round(off_y), 0), max(rh - 960, 0))
+    off_x = min(max(round(off_x), 0), max(rw - 1080, 0))
+    print(f"face framing: zoom {zoom:.3f}x (cover {cover:.3f}, cap {max_zoom}) "
+          f"-> head {face_h:.0f}px = {face_h / 960:.1%} of the panel, "
+          f"headroom {face_top - off_y:.0f}px, "
+          f"chin gap {960 - (face_bot - off_y):.0f}px")
+    return zoom, rw, rh, off_x, off_y
 
 
 def align(scenes, words, total_ms):
@@ -340,17 +405,23 @@ def main():
     # excluded by construction), zoomed to cover, face-positioned.
     v = CFG["video"]
     (cx, cy, cw, ch), face = analyze_avatar(avatar_kf, meta)
-    sc = max(1080 / cw, 960 / ch)
-    rw2, rh2 = round(cw * sc), round(ch * sc)
-    if face:
-        ft = (face[0] - cy) * sc          # face top in zoomed content coords
-        fb = (face[1] - cy) * sc
-        off_y = ft - 150
-        off_y = max(off_y, fb + 40 - 960)  # chin stays inside
+    # Landscape looks get face-framed (see frame_landscape_face); portrait
+    # looks keep the original cover-scale + "head 150px below the seam" crop.
+    landscape = cw / max(ch, 1) > LANDSCAPE_RATIO
+    if landscape and face:
+        sc, rw2, rh2, off_x, off_y = frame_landscape_face((cx, cy, cw, ch), face, v)
     else:
-        off_y = v["avatarFocusY"] * rh2 - 480
-    off_y = min(max(round(off_y), 0), max(rh2 - 960, 0))
-    off_x = max((rw2 - 1080) // 2, 0)
+        sc = max(1080 / cw, 960 / ch)
+        rw2, rh2 = round(cw * sc), round(ch * sc)
+        if face:
+            ft = (face["top"] - cy) * sc   # face top in zoomed content coords
+            fb = (face["bottom"] - cy) * sc
+            off_y = ft - 150
+            off_y = max(off_y, fb + 40 - 960)  # chin stays inside
+        else:
+            off_y = v["avatarFocusY"] * rh2 - 480
+        off_y = min(max(round(off_y), 0), max(rh2 - 960, 0))
+        off_x = max((rw2 - 1080) // 2, 0)
     speed = v["speed"]
     final = os.path.join(epdir, "final.mp4")
 
@@ -360,7 +431,7 @@ def main():
         scf = max(1080 / cw, 1920 / ch)
         rwf, rhf = round(cw * scf), round(ch * scf)
         if face:
-            ftf = (face[0] - cy) * scf
+            ftf = (face["top"] - cy) * scf
             offf = min(max(round(ftf - 320), 0), max(rhf - 1920, 0))
         else:
             offf = max((rhf - 1920) // 3, 0)
@@ -400,6 +471,15 @@ def main():
         frames = [f for f in face.get("frames", []) if f.get("headroom") is not None]
         only_face_failed = all(v.get("pass", True) for k, v in report.items()
                                if isinstance(v, dict) and k != "face")
+        # A head that is simply too small in the panel cannot be fixed by
+        # panning the crop, so don't burn two more composites trying.
+        too_small = any(f.get("face_frac", 1) < 0.34 for f in frames)
+        if too_small:
+            raise SystemExit(
+                f"QA face check: head is only "
+                f"{min(f.get('face_frac', 1) for f in frames):.0%} of the panel — "
+                f"panning cannot fix this. Raise video.faceTarget or check the "
+                f"HeyGen look's framing (see {epdir}/qa.json)")
         if not (only_face_failed and frames and attempt < 2):
             raise SystemExit(f"QA failed (see {epdir}/qa.json)")
         min_hr = min(f["headroom"] for f in frames)

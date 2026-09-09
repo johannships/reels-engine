@@ -29,6 +29,14 @@ EPISODES = os.environ.get("REELS_EPISODES_DIR") or os.path.normpath(
 
 SEAM = 960          # avatar slot top in the 1080x1920 frame
 HEADROOM_MIN = 60   # px required between seam and top of face box
+# Ceiling + size floor added deliberately (2026-09-09). The old gate only had
+# a headroom FLOOR, so a landscape HeyGen look that left the speaker small and
+# low in the panel sailed through: that reel measured headroom 300-326px with
+# the head at 33% of the panel and still scored "PASS". Both new limits are
+# calibrated against the reference reel, which measures headroom 76-122px with
+# the head at 73-86% of the panel — comfortably inside them.
+HEADROOM_MAX = 280  # px — above this the head is parked too low to read
+FACE_FRAC_MIN = 0.34  # head-box height as a fraction of the 960px panel
 CHIN_MARGIN = 40    # px required between face box bottom and frame bottom
 
 
@@ -200,14 +208,20 @@ def check_face(path, dur, report):
             headroom = y                       # px below seam (bottom-half coords)
             chin_gap = (1920 - SEAM) - (y + h)
             results.append({"t": round(t, 1), "headroom": int(headroom),
-                            "chin_gap": int(chin_gap)})
+                            "chin_gap": int(chin_gap),
+                            "face_frac": round(h / (1920 - SEAM), 3)})
     found = [r for r in results if r.get("headroom") is not None]
     ok = (len(found) >= 2
-          and all(r["headroom"] >= HEADROOM_MIN for r in found)
-          and all(r["chin_gap"] >= -10 for r in found))  # chin may sit at edge by design
+          and all(HEADROOM_MIN <= r["headroom"] <= HEADROOM_MAX for r in found)
+          and all(r["face_frac"] >= FACE_FRAC_MIN for r in found)
+          # The chin may sit right on the bottom edge by design — the
+          # reference reel runs it 28px off — so this stays a loose check.
+          and all(r["chin_gap"] >= -10 for r in found))
     report["face"] = {"pass": bool(ok), "frames": results,
-                      "rule": f"headroom>={HEADROOM_MIN}px in all detected frames, "
-                              f">=2 of {len(times)} frames must detect a face"}
+                      "rule": f"headroom {HEADROOM_MIN}-{HEADROOM_MAX}px and "
+                              f"head >= {FACE_FRAC_MIN:.0%} of the panel in all "
+                              f"detected frames, >=2 of {len(times)} frames must "
+                              f"detect a face"}
     return ok
 
 
