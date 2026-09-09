@@ -27,6 +27,20 @@ const MONEY_WORDS = new Set([
   'cash', 'client', 'clients', 'stars', 'star', 'percent',
 ]);
 
+/**
+ * Repo names are full of ordinary English ("i-have-adhd", "context-mode",
+ * "browser-use"), and accenting a name's parts would light up pronouns and
+ * filler all through the script. These are never taken from a repo name.
+ */
+const STOPWORDS = new Set([
+  'have', 'this', 'that', 'with', 'from', 'your', 'they', 'them', 'then',
+  'than', 'what', 'when', 'will', 'were', 'been', 'because', 'about',
+  'into', 'over', 'just', 'like', 'make', 'more', 'most', 'some', 'such',
+  'code', 'open', 'source', 'tool', 'tools', 'agent', 'agents', 'data',
+  'text', 'file', 'files', 'mode', 'main', 'core', 'auto', 'user', 'users',
+  'self', 'full', 'best', 'good', 'next', 'live', 'time', 'work', 'help',
+]);
+
 const strip = (word: string) =>
   word.toLowerCase().replace(/[^a-z0-9$'-]/g, '');
 
@@ -47,8 +61,10 @@ export const repoTokens = (scenes: Scene[]): Set<string> => {
       // Hyphenated names also show up split across whisper tokens.
       for (const piece of part.split(/[-_.]/)) {
         // Single letters ("i" in "i-have-adhd") would accent every stray
-        // pronoun, so only keep pieces that read as words.
-        if (piece.length >= 4) out.add(strip(piece));
+        // pronoun, so only keep pieces that read as words — and never a
+        // stopword, or "i-have-adhd" would accent every "have" in the script.
+        const token = strip(piece);
+        if (token.length >= 4 && !STOPWORDS.has(token)) out.add(token);
       }
     }
   }
