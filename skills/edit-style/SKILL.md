@@ -1,8 +1,8 @@
 ---
 name: edit-style
-description: Turn a raw talking-head take into a dynamically-edited vertical reel — full-face / full-graphic / split layouts that switch per line, generated graphic cards, word-synced captions, and a ducked music bed. The "looks like an editor made it" style, produced entirely from code. Also covers how to WRITE the script so the voice doesn't read as AI. Point an agent at this, hand it a raw take or a topic, and it edits. Triggers on "edit this reel", "make it look edited", "add the dynamic layout / captions / graphics", "write a reel script".
+description: Turn a raw talking-head take into a dynamically-edited vertical reel — full-face / full-graphic / split layouts that switch per line, real UI and official-logo panels, captions on every word, voice + synthesised SFX (no music bed). The "looks like an editor made it" style, produced entirely from code, with hard QA gates (caption sync on the final render, A/V length, loudness, contact sheet, claims). Also covers how to WRITE the script so the voice doesn't read as AI. Point an agent at this, hand it a raw take or a topic, and it edits. Triggers on "edit this reel", "make it look edited", "add the dynamic layout / captions / graphics", "write a reel script".
 author: jars
-version: 1.1.0
+version: 1.2.0
 tags: [editing, reels, remotion, whisper, ffmpeg, captions, video, script]
 ---
 
@@ -10,23 +10,29 @@ tags: [editing, reels, remotion, whisper, ffmpeg, captions, video, script]
 
 You turn one raw talking-head clip (an AI clone render OR a real recording)
 into a finished 1080x1920 reel that looks hand-edited: the frame never sits
-still, graphics are generated (not stock), and captions land on the beat.
+still, graphics are real UI, real logos or generated (not stock), and
+captions land on the beat.
 
 Nothing here is dragged on a timeline. Every decision is written as a shot
 plan and rendered by code.
 
-**Working toolkit: `~/reel-style/`** — `STYLE.md` (measured spec), `tools/`
-(the whole pipeline), `tools/panels-src/` (the Remotion panels), `scripts/`
-(past scripts with their verified facts). Start there rather than rebuilding.
+**Keep a working toolkit folder** — a `STYLE.md` (your measured spec), the
+pipeline scripts, the Remotion panels, and past scripts with their verified
+facts. Start there rather than rebuilding. One-command engine for the house
+formats: the **house-reel-edit** skill (`skills/house-reel-edit`). Small gate
+and capture scripts: [`tools/`](tools/) next to this file.
 
 ## The stack (all free/local except the clone)
 
-- **Whisper** (`whisper-cli`, model `~/yt-thumb/models/ggml-small.en.bin`) —
-  word-level timestamps. This is what makes captions and cuts land on the audio.
+- **Whisper** — word-level timestamps. This is what makes captions and cuts
+  land on the audio. `whisper-cli` + `ggml-small.en.bin` for
+  the transcript and SRT text; **mlx-whisper large-v3-turbo** for caption cue
+  TIMING (small.en drifts 0.1–0.4s on the same audio, measured 2 Oct 2026).
 - **Remotion** (React → video) — every graphic panel rendered to an exact
-  duration. Runs standalone by symlinking `~/Desktop/Reels Engine/studio/node_modules`.
-- **ffmpeg** — crops, composites the layouts, burns captions, mixes the bed.
-  NOTE: this Mac's ffmpeg is stripped — no `drawtext`, `subtitles`, `libass`.
+  duration. Runs standalone by symlinking this repo's `studio/node_modules`.
+- **Playwright, headless only** — real screen footage (see Screens).
+- **ffmpeg** — crops, composites the layouts, burns captions, mixes voice + SFX.
+  NOTE: a stripped ffmpeg build may have — no `drawtext`, `subtitles`, `libass`.
   Text is rendered to transparent PNGs with Pillow and composited with `overlay`.
 - **HeyGen** — only if the take is an AI clone.
 - **Claude Code** — orchestrates all of the above.
@@ -100,16 +106,30 @@ because…"). Say the thing and stop. Real speech isn't stylised, it's direct.
 
 ---
 
-# Part 2 — The voice (AI clone takes)
+# Part 2 — The voice
+
+**Default is a raw take from the creator; the agent edits.** Clone only as a fallback.
+
+## AI clone takes
 
 - **Pair clone N with voice N.** Mismatched pairs sound wrong. Current
-  production pairing is **13 + 13**, ear-confirmed.
+  production pairing is **11 + 11** (owner revert 31 Aug 2026; clone 13 rejected in production). Speed **1.5**, ear-approved 12 Sep 2026.
 - **`SPEED` 1.45–1.5.** Slower reads as AI. 1.2 was rejected as "way too
   slow". 1.5 is HeyGen's ceiling.
 - **One continuous render** for the whole script — chunked renders drift.
 - **`elevenlabs_settings` does nothing on cloned voices** (HTTP 400, silently
   retried without). `emotion` is unavailable too. Speed and pitch are the
   only real levers.
+
+## Raw takes
+
+- **iPhone HDR (HLG / Dolby Vision) must be tone-mapped to SDR BT.709 first**,
+  or it grades washed out. Check the fps survived: avconvert once turned a
+  60 fps take into 18.75 fps.
+- **Keep the last take** of any repeated line. Cut dead air and false starts.
+  Never cut mid-word.
+- **Cut private third-party detail** he says in passing (a friend's employer,
+  a client, money). List the cut in QA so the owner can restore it.
 
 ## Silence trimming — the setting that matters most
 
@@ -133,29 +153,54 @@ during a pause (measured frame delta 0.02/255).
 ## The three layouts
 
 - **FULL** — the face fills the frame. Hooks and personal beats.
-- **GFX** — a full-screen generated graphic, no face. A stat, a card, a claim.
-- **PIP** — graphic on top, face in a rounded card at the bottom
-  (`x0 y1087 1080x833 r48`). Show a logo while you keep talking.
+- **GFX** — a full-screen graphic, no face: real UI, a stat, a card, a claim.
+- **PIP / split** — graphic on top, face in a card at the bottom
+  (`x0 y1087 1080x833 r48`). Show a logo or a screen while you keep talking.
 
 Switching every 2–5s is what reads as "edited". Open on FULL or PIP, break to
 GFX on each key beat, land the CTA on GFX then close on FULL.
 
+## The hook: official brand logo (owner rule, 2 Oct 2026)
+
+"The hook can use official brand logos. If the video is talking about Claude,
+show the Claude logo, for pattern recognition."
+
+- In the hook (first ~2s), when the topic is a named product or brand
+  (Claude, GitHub, Metricool, OpenAI, Blender…), show that brand's
+  **official** logo.
+- Fetch it from the brand's official press / brand page or the official
+  site's own SVG. Never redraw it or AI-generate it.
+- Show it as a clean panel element near the caption (the split top panel or
+  a card above the caption), never a pill or sticker.
+- Don't alter its colours or proportions. Don't imply endorsement: it names
+  the subject (nominative use), nothing more.
+- Cache every logo in `brand-logos/<brand>.<svg|png>` with a
+  `SOURCES.md` line per file: brand, source URL, date fetched. Reuse from
+  the cache, and re-check the source if the brand rebrands.
+
 ## Pipeline order
 
-1. **Tighten** the take (Part 2 settings).
+1. **Prep** the take (HDR → SDR, fps check) and **tighten** it (Part 2).
 2. **Transcribe** the tightened audio with Whisper.
 3. **Author the shot plan** — `(panel_kind, layout, anchor_phrase, content)`.
    `anchor_phrase` is a phrase from the script, matched against the transcript
    so the shot starts when those words are actually said. **Never hand-type
    timestamps.** Snap boundaries to script words so a cut never lands
    mid-name ("Matt" / "Pocock's").
-4. **Render panels** with Remotion, each to its exact shot duration.
-5. **Composite** per shot with ffmpeg, concat, lay the continuous voice over.
-6. **Burn captions** (see below).
-7. **Run both QA gates.** Do not ship if either fails.
-8. **Add the bed** (Part 4).
+4. **Capture screens and fetch logos** (below). Look at them before using them.
+5. **Render panels** with Remotion, each to its exact shot duration.
+6. **Composite** per shot with ffmpeg, concat, lay the continuous voice over.
+   Run every render under **`nice -n 15`**: overload has dropped the
+   creator's mic audio while they were recording. Look-dev on stills first, then do one
+   full render.
+7. **Burn captions** on every word (below).
+8. **Mix voice + SFX and master** (Part 4).
+9. **Run the QA gates** (Part 5). Do not ship if any fails.
 
-## Captions — two systems, never mixed
+## Captions — every word, from the first frame
+
+Burned-in captions run continuously from the first word to the last. Punch
+phrases and kinetic type are extra, never a replacement.
 
 | | graphic shots | talking-head shots |
 |---|---|---|
@@ -166,10 +211,33 @@ GFX on each key beat, land the CTA on GFX then close on FULL.
 
 - **Caption TEXT comes from the script; only the TIMING comes from Whisper.**
   Using Whisper's text put "THE CARPOTHE" on screen instead of "THE KARPATHY".
+- **Fix name spellings** in captions and the SRT: Claude (not Cloud/Claud),
+  Metricool, GitHub, Fable, Opus, Sonnet, Haiku, and every product named in
+  the reel. Keep a fix map and apply it to every Whisper pass.
+- **Cue timing comes from a re-whisper of the FINAL audio** (turbo), not the
+  raw. Raw-take times shifted by the edit failed the sync gate twice on 2 Oct.
 - **Shrink long words to fit** or "OVERCOMPLICATING" clips to "OVERCOMPLICAT."
 - **PIP captions need `capY≈0.38`** — at 0.50 a two-line cue runs under the
-  avatar card and gets clipped.
+  avatar card and gets clipped. Captions never cover the mouth.
 - Caption only the shots you replaced. Kept B-roll already has its own.
+
+## Screens — clock-controlled headless capture
+
+Screen-recording a monitor (or filming it with a phone) gives jitter, moiré
+and a menu bar full of private things. Capture instead:
+
+- **Playwright, headless only.** Never open a visible browser window.
+- **Freeze the page clock**: an init script replaces `performance.now`,
+  `Date.now` and `requestAnimationFrame`, then step it at 60 Hz and keep every
+  2nd frame for 30 fps. Every frame is exact, however slow the machine is.
+  Script: `tools/capture_clock.js`.
+- Capture at the reel's size (e.g. 432x768 CSS at 2.5x = 1080x1920).
+- Public pages logged out. Recapture live numbers (stars, trending) the day
+  of render and note the capture time in QA.
+- Highlight with outline boxes anchored to the real UI element, wiped in on
+  the spoken word. Pan and push-in on the capture; no fake UI. A vendor's
+  claim is shown as their own screenshot with "source: X README", never
+  restated as your graphic.
 
 ## Framing
 
@@ -188,37 +256,52 @@ wall. YuNet's box is brow-to-chin, so top-of-head ≈ `y - 0.55h`.
 
 ---
 
-# Part 4 — Music bed
+# Part 4 — Audio: voice + SFX, no music bed
 
-**Synthesise it. Never licence it.** Content ID matches fingerprints of known
-recordings; audio generated fresh has nothing to match, on any platform.
-"Royalty-free" libraries are registered in Content ID — a licence buys a
-whitelist, not immunity. CC0 gets fraudulently claimed. Generated audio is
-the only option with no legitimate claim available.
+Raw-voice videos ship **voice + synthesised SFX only**. No music bed.
 
-**The bed must live in 400 Hz – 6 kHz.** A low ambient drone measured 99.2%
-of its energy below 200 Hz — phone speakers roll that off entirely, so it was
-*inaudible*, not quiet. Verify the band split with an FFT before judging
-level. A plucked arpeggio over a 4-chord loop puts 91% in the audible band.
-
-- Voice sits **~14 dB above** the bed (`BED_DB=-36 TICK_DB=-38`).
-- Add a soft tick on every shot cut — this marks the edit rhythm and is
-  probably a bigger retention lever than the music itself.
-- Duck under a voice envelope follower.
-- **Mix the bed in BEFORE loudnorm** so the whole thing normalises to −14 LUFS
-  as one.
+- **Crisp voice chain:** high-pass 70–80 Hz, light denoise (`afftdn` nr ~8).
+- **SFX are synthesised, never licensed.** Content ID matches fingerprints of
+  known recordings; generated audio has nothing to match. "Royalty-free"
+  libraries are registered in Content ID and CC0 gets fraudulently claimed.
+- Few SFX: a sub hit on the hook word, a soft tick or whoosh on graphic cuts,
+  clicks on highlights. 12–20 dB under the voice peak. If you notice them
+  over the words, they're too loud.
+- **Master to −14 LUFS integrated, ≤ −1.5 dBTP** with gain + a true-peak
+  limiter, iterated and measured on the final mp4. loudnorm two-pass failed
+  on peaks on 2 Oct, and its linear mode silently falls back to dynamic.
 
 ---
 
-# Part 5 — QA gates (both must pass)
+# Part 5 — QA gates (all must pass)
+
+`tools/final_gates.sh final.mp4` runs 3, 4 and the contact sheet;
+`tools/caption_sync_gate.py` runs 2. Write results to `QA.md`.
 
 1. **Framing** — head-top >3% and chin <94% of every crop, measured with a
    real face detector. Catches the chin-cutoff class of bug.
-2. **Caption sync** — re-transcribe the **finished** video and correlate word
-   onsets against the audio's rising-energy envelope. Fail past 0.25s.
-   Align on onsets, not word spans; spans bias the result by ~0.2s.
-   A good build measures 0.00–0.09s median.
+2. **Caption sync, per chapter, on the FINAL render.** Re-transcribe the
+   finished mp4 (turbo), match caption words to it, and gate each chapter:
+   **median ≤ 0.12s, p95 ≤ 0.25s**. Cross-check against the audio's
+   rising-energy onsets. On a fail: retime that chapter's cues to the final
+   words, re-render only the affected frames, re-whisper, re-gate. Loop until
+   every chapter passes (reel4 needed two loops on 2 Oct).
+3. **Audio length == video length** (within one frame), checked with ffprobe
+   right after every render. Overload has silently dropped audio before.
+4. **Loudness** — −14 ±1 LUFS, true peak ≤ −1.5 dBTP. No black frames.
+5. **Contact sheet** — 12 evenly spaced frames in one image. **Open it and
+   look at it** before saying done. Fail on: any pill, badge or sticker,
+   captions over the face, a wrong or distorted logo, private data, graphics
+   cut by the safe zones or the 4:5 feed crop.
+6. **CLAIMS** — no number on screen without a source file you can name
+   (path + date). Measured ranges beat spoken roundings ("67–86 sec", not
+   "about a minute"). Anything he says on camera that the source doesn't support
+   stays off screen and is listed under CLAIMS in `QA.md` for the owner to decide.
+7. **First word survives** — re-whisper the first 2s after any head trim.
 
+Deliverables: `final.mp4`, `contact.png`, `captions.srt` (re-whisper of the
+final, spellings fixed), `QA.md`, and a `LOG.md` written as you go (agents
+die after 10 min silent).
 
 ## Gesture-anchored graphics (verdict-card / pointing reels)
 
@@ -238,13 +321,13 @@ once. When on-screen graphics are things the speaker POINTS at:
 - **Face-detector outliers can be hands.** A hand raised in front of the
   face reads as head_top jumping to 20% for one frame. Before shrinking a
   layout over one outlier measurement, eyeball that frame: hand or head?
-- **Logo sourcing that works:** google s2 favicon service
-  (`google.com/s2/favicons?domain=X&sz=256`) covers most brands with
-  transparency; GitHub org avatars (`github.com/<org>.png?size=460`) as the
-  high-res fallback; wikimedia thumbs are UA-blocked from scripts. White
-  tiles make opaque-white-background logos a non-issue. ALWAYS render a
-  labeled contact sheet of every logo and look at it before compositing --
-  this catches wrong brands and broken files in one glance.
+- **Logo sourcing:** official press / brand page or the site's own SVG first
+  (see the hook rule). GitHub org avatars (`github.com/<org>.png?size=460`)
+  are the org's own mark for repos. Favicon services
+  (`google.com/s2/favicons?domain=X&sz=256`) are a low-res last resort,
+  never for the hook. Wikimedia thumbs are UA-blocked from scripts. ALWAYS
+  render a labeled contact sheet of every logo and look at it before
+  compositing: it catches wrong brands and broken files in one glance.
 - **Trim leading dead air by RMS, not by Whisper.** Whisper stamps the first
   word at 0.00 even when the voice starts at 0.50; measure a 20ms RMS
   envelope, cut to onset minus ~0.1s, then re-transcribe the trimmed file's
@@ -291,6 +374,7 @@ owner reads them as AI slop. Real Vox / Johnny Harris short-form is:
   <= 1620px, sides >= 60px on a 1080x1920 frame. A card row that starts at
   y=60 gets its labels cut off on phones. QA gate: check the 4:5 center crop
   (1080x1350, y 285-1635) still shows every graphic that carries meaning.
+  Captions at y 1612 graze the crop; y ~1560 is safe.
 - **Forward panel props generically.** Copying a hardcoded list of prop names
   means a new panel kind silently gets `undefined` and Remotion dies with
   "outputRange must contain only numbers".
@@ -298,13 +382,26 @@ owner reads them as AI slop. Real Vox / Johnny Harris short-form is:
   *previous video's* repos and checklist. Panels take data as props, always.
 - **Sample frames proportionally**, not at fixed timestamps — a shorter take
   makes fixed offsets run past the end and the build crashes.
+- **Nothing private on screen**: no finances, revenue, client names, brand or
+  account ids, or internal files. Tables copied from internal files drop any row
+  with a dollar figure or a client.
 
 ## Rules that keep the edit from looking like AI slop
 
-- Captions timed by Whisper, never guessed. Wrong timing is the #1 tell.
+- **No floating pills, bubbles or tags. Ever.** (owner, 28 Sep 2026: "remove
+  the top bubble thing and never have those... looks like AI slop.") Banned:
+  - glass or rounded "pill" badges floating over or above the head, e.g. "Opus 5.5" or "Claude Code"
+  - a corner tag on every frame, e.g. "AI EDIT", "AI AGENTS" or "PART 1"
+  - joke or "random graphic" stickers and chip clusters
+  - a REC chip
+
+  Instead, name a tool with its **real product UI or official logo** as a proper cutaway or split panel: a screenshot on a card, or the actual app window. Otherwise let the caption carry it. Graphics must look like a professional editor made them: fewer, bigger, purposeful, and anchored to a layout (split top panel, full-screen cutaway, lower third). Nothing should float over the face.
+
+  QA gate: in the contact sheet, any small badge, pill or sticker = fail.
+- **No code-generated motion-graphics sizzle.** Use founder footage and real
+  product screens.
+- Captions timed by Whisper on the final audio, never guessed. Wrong timing
+  is the #1 tell.
 - One accent colour. Serif-italic OR bold-sans captions, not both at once.
-- The music sits *under* the voice. If you hear the bed over the words, it's
-  too loud.
 - Show, don't narrate: when the voice names a thing, that thing is on screen.
-- Use **official logos** where a brand is named — org avatars from the
-  GitHub API are the real marks.
+- Use **official logos** where a brand is named (hook rule above).

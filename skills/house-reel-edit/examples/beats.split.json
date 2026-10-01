@@ -1,0 +1,766 @@
+{
+ "format": "split",
+ "keyword": "CLAUDE",
+ "caption_fixes": {
+  "a email": "an email",
+  "DMS": "DMs",
+  "DeepLine": "Deepline",
+  "Claud": "Claude"
+ },
+ "measured": [],
+ "sfx": [
+  {
+   "at": 0.1,
+   "sfx": "tick_hi",
+   "why": "hook graphic on frame 1"
+  },
+  {
+   "at": "AI-0.03",
+   "sfx": "hook_subboom",
+   "under_db": 12,
+   "why": "the one loud hit: AI takes over outreach"
+  },
+  {
+   "at": "Deepline",
+   "sfx": "pop_soft",
+   "why": "tool name card"
+  },
+  {
+   "at": "It brings+0.1",
+   "sfx": "pop_cut",
+   "why": "cut to full graphic"
+  },
+  {
+   "at": "one API",
+   "sfx": "tick_lo",
+   "why": "API card lands"
+  },
+  {
+   "at": "find customers",
+   "sfx": "tick_hi",
+   "why": "first prompt line types"
+  },
+  {
+   "at": "and it could+0.1",
+   "sfx": "pop_cut",
+   "why": "cut to full graphic"
+  },
+  {
+   "at": "Claude",
+   "sfx": "typing",
+   "why": "keyword types into the comment field"
+  },
+  {
+   "at": "send",
+   "sfx": "tick_hi",
+   "why": "DM card"
+  }
+ ],
+ "scenes": [
+  {
+   "from": 0,
+   "layout": "split",
+   "say": "Most people don't realize that",
+   "elements": [
+    {
+     "type": "card",
+     "title": "Outreach",
+     "title_size": 96,
+     "sub": "by hand",
+     "sub_size": 40,
+     "icon": "list",
+     "icon_color": "grey",
+     "w": 760,
+     "h": 300,
+     "y": 440,
+     "at": 0,
+     "anim": "none"
+    },
+    {
+     "type": "strike",
+     "from": [
+      200,
+      580
+     ],
+     "to": [
+      880,
+      300
+     ],
+     "at": 0
+    }
+   ]
+  },
+  {
+   "from": "AI can",
+   "layout": "split",
+   "say": "AI can run your entire cold outreach for you",
+   "elements": [
+    {
+     "type": "tile",
+     "icon": "agent",
+     "label": "AI",
+     "size": 190,
+     "x": 230,
+     "y": 430
+    },
+    {
+     "type": "arrow",
+     "from": [
+      345,
+      415
+     ],
+     "to": [
+      540,
+      415
+     ],
+     "at": "run",
+     "dur": 0.3
+    },
+    {
+     "type": "tiles",
+     "items": [
+      {
+       "icon": "mail",
+       "color": "ink"
+      },
+      {
+       "icon": "mail",
+       "color": "ink"
+      },
+      {
+       "icon": "mail",
+       "color": "ink"
+      }
+     ],
+     "size": 120,
+     "xs": [
+      650,
+      790,
+      930
+     ],
+     "y": 390,
+     "at": "cold",
+     "stagger": 0.12
+    },
+    {
+     "type": "label",
+     "text": "cold outreach",
+     "size": 36,
+     "color": "ink",
+     "x": 790,
+     "y": 530,
+     "at": "outreach"
+    }
+   ]
+  },
+  {
+   "from": "And there's",
+   "layout": "split",
+   "say": "And there's a tool called Deepline that makes it easier",
+   "elements": [
+    {
+     "type": "label",
+     "text": "the tool",
+     "size": 40,
+     "color": "terra",
+     "x": 540,
+     "y": 270,
+     "at": "tool"
+    },
+    {
+     "type": "card",
+     "title": "Deepline",
+     "title_size": 110,
+     "w": 760,
+     "h": 200,
+     "y": 420,
+     "at": "Deepline"
+    },
+    {
+     "type": "title",
+     "text": "makes it easier",
+     "size": 48,
+     "weight": 800,
+     "color": "green",
+     "y": 600,
+     "at": "makes"
+    }
+   ]
+  },
+  {
+   "from": "It's usage",
+   "layout": "split",
+   "say": "It's usage based pricing",
+   "elements": [
+    {
+     "type": "tile",
+     "icon": "gauge",
+     "size": 200,
+     "x": 260,
+     "y": 440
+    },
+    {
+     "type": "title",
+     "text": "Usage based",
+     "size": 76,
+     "x": 680,
+     "y": 385,
+     "at": "usage",
+     "anim": "slide"
+    },
+    {
+     "type": "title",
+     "text": "pricing",
+     "size": 76,
+     "color": "terra",
+     "x": 640,
+     "y": 500,
+     "at": "pricing",
+     "anim": "slide"
+    }
+   ]
+  },
+  {
+   "from": "and it gives",
+   "layout": "split",
+   "say": "and it gives AI access to everything",
+   "elements": [
+    {
+     "type": "line",
+     "points": [
+      [
+       540,
+       420
+      ],
+      [
+       170,
+       300
+      ]
+     ],
+     "at": "everything",
+     "dur": 0.2,
+     "color": "line",
+     "width": 3
+    },
+    {
+     "type": "line",
+     "points": [
+      [
+       540,
+       420
+      ],
+      [
+       910,
+       300
+      ]
+     ],
+     "at": "everything+0.07",
+     "dur": 0.2,
+     "color": "line",
+     "width": 3
+    },
+    {
+     "type": "line",
+     "points": [
+      [
+       540,
+       420
+      ],
+      [
+       150,
+       560
+      ]
+     ],
+     "at": "everything+0.14",
+     "dur": 0.2,
+     "color": "line",
+     "width": 3
+    },
+    {
+     "type": "line",
+     "points": [
+      [
+       540,
+       420
+      ],
+      [
+       930,
+       560
+      ]
+     ],
+     "at": "everything+0.21",
+     "dur": 0.2,
+     "color": "line",
+     "width": 3
+    },
+    {
+     "type": "tile",
+     "icon": "dots",
+     "dotted": true,
+     "size": 100,
+     "x": 170,
+     "y": 300,
+     "at": "everything"
+    },
+    {
+     "type": "tile",
+     "icon": "dots",
+     "dotted": true,
+     "size": 100,
+     "x": 910,
+     "y": 300,
+     "at": "everything+0.07"
+    },
+    {
+     "type": "tile",
+     "icon": "dots",
+     "dotted": true,
+     "size": 100,
+     "x": 150,
+     "y": 560,
+     "at": "everything+0.14"
+    },
+    {
+     "type": "tile",
+     "icon": "dots",
+     "dotted": true,
+     "size": 100,
+     "x": 930,
+     "y": 560,
+     "at": "everything+0.21"
+    },
+    {
+     "type": "tile",
+     "icon": "agent",
+     "label": "AI",
+     "size": 180,
+     "x": 540,
+     "y": 430
+    },
+    {
+     "type": "tile",
+     "icon": "key",
+     "color": "ink",
+     "size": 100,
+     "x": 680,
+     "y": 330,
+     "at": "access"
+    }
+   ]
+  },
+  {
+   "from": "from data",
+   "layout": "split",
+   "say": "from data providers like Apollo",
+   "elements": [
+    {
+     "type": "tile",
+     "icon": "db",
+     "size": 200,
+     "x": 220,
+     "y": 440
+    },
+    {
+     "type": "title",
+     "text": "Data providers",
+     "size": 72,
+     "x": 660,
+     "y": 380,
+     "anim": "slide"
+    },
+    {
+     "type": "label",
+     "text": "like",
+     "size": 32,
+     "x": 470,
+     "y": 510,
+     "at": "like"
+    },
+    {
+     "type": "title",
+     "text": "Apollo",
+     "size": 60,
+     "weight": 800,
+     "color": "terra",
+     "x": 650,
+     "y": 505,
+     "at": "Apollo"
+    }
+   ]
+  },
+  {
+   "from": "to actual",
+   "layout": "split",
+   "say": "to actual cold email infrastructure like Instantly",
+   "elements": [
+    {
+     "type": "tile",
+     "icon": "mail",
+     "size": 200,
+     "x": 220,
+     "y": 440
+    },
+    {
+     "type": "title",
+     "text": "Cold email",
+     "size": 72,
+     "x": 620,
+     "y": 340,
+     "at": "cold email",
+     "anim": "slide"
+    },
+    {
+     "type": "title",
+     "text": "infrastructure",
+     "size": 56,
+     "weight": 700,
+     "color": "grey",
+     "x": 660,
+     "y": 425,
+     "at": "infrastructure",
+     "anim": "slide"
+    },
+    {
+     "type": "label",
+     "text": "like",
+     "size": 32,
+     "x": 470,
+     "y": 530,
+     "at": "like#2"
+    },
+    {
+     "type": "title",
+     "text": "Instantly",
+     "size": 60,
+     "weight": 800,
+     "color": "terra",
+     "x": 680,
+     "y": 525,
+     "at": "Instantly"
+    }
+   ]
+  },
+  {
+   "from": "It brings",
+   "layout": "full",
+   "say": "It brings the entire go to market stack together to one API so your AI agent can run the entire thing so much faster",
+   "elements": [
+    {
+     "type": "label",
+     "text": "the go to market stack",
+     "size": 38,
+     "color": "ink",
+     "y": 330,
+     "at": "It brings+0.05"
+    },
+    {
+     "type": "tiles",
+     "items": [
+      {
+       "icon": "db",
+       "label": "Data",
+       "sub": "APOLLO"
+      },
+      {
+       "icon": "mail",
+       "label": "Email",
+       "sub": "INSTANTLY"
+      },
+      {
+       "icon": "dots",
+       "label": "Everything else",
+       "dotted": true
+      }
+     ],
+     "size": 170,
+     "xs": [
+      220,
+      540,
+      860
+     ],
+     "y": 505,
+     "at": "It brings+0.12",
+     "stagger": 0.18
+    },
+    {
+     "type": "line",
+     "points": [
+      [
+       220,
+       760
+      ],
+      [
+       220,
+       790
+      ],
+      [
+       540,
+       790
+      ],
+      [
+       540,
+       810
+      ]
+     ],
+     "at": "together",
+     "dur": 0.45,
+     "color": "terra"
+    },
+    {
+     "type": "line",
+     "points": [
+      [
+       860,
+       760
+      ],
+      [
+       860,
+       790
+      ],
+      [
+       540,
+       790
+      ]
+     ],
+     "at": "together",
+     "dur": 0.45,
+     "color": "terra"
+    },
+    {
+     "type": "card",
+     "title": "One API",
+     "sub": "all together",
+     "icon": "api",
+     "icon_color": "ink",
+     "w": 600,
+     "h": 200,
+     "y": 910,
+     "at": "one API"
+    },
+    {
+     "type": "line",
+     "points": [
+      [
+       540,
+       1020
+      ],
+      [
+       540,
+       1100
+      ]
+     ],
+     "at": "so your",
+     "dur": 0.3,
+     "color": "terra"
+    },
+    {
+     "type": "tile",
+     "icon": "agent",
+     "label": "Your AI agent",
+     "size": 210,
+     "y": 1250,
+     "at": "agent"
+    },
+    {
+     "type": "tile",
+     "icon": "bolt",
+     "color": "green",
+     "size": 120,
+     "x": 830,
+     "y": 1210,
+     "at": "much"
+    },
+    {
+     "type": "title",
+     "text": "So much faster",
+     "size": 80,
+     "color": "green",
+     "y": 1500,
+     "at": "faster"
+    }
+   ]
+  },
+  {
+   "from": "With this",
+   "layout": "split",
+   "say": "With this you can give your agent a prompt like find customers who match my ICP, check to see they had recent buying signals showing they're interested, and then add them to an email campaign",
+   "elements": [
+    {
+     "type": "window",
+     "title": "your agent",
+     "illustrative": true,
+     "w": 960,
+     "h": 400,
+     "y": 440,
+     "at": "With this",
+     "placeholder": "Give your agent a prompt",
+     "lines": [
+      {
+       "text": "Find customers who match my ICP",
+       "at": "find customers",
+       "until": "ICP.end"
+      },
+      {
+       "text": "Check for recent buying signals",
+       "at": "check",
+       "until": "signals.end"
+      },
+      {
+       "text": "Add them to an email campaign",
+       "at": "add them",
+       "until": "campaign.end"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "from": "and it could",
+   "layout": "full",
+   "say": "And it could do the entire thing end to end because it has access to everything that it needs",
+   "elements": [
+    {
+     "type": "label",
+     "text": "one prompt",
+     "size": 38,
+     "color": "ink",
+     "y": 300
+    },
+    {
+     "type": "tiles",
+     "items": [
+      {
+       "icon": "search",
+       "label": "Find ICP",
+       "check_at": "entire#4"
+      },
+      {
+       "icon": "signal",
+       "label": "Buying signals",
+       "check_at": "entire#4+0.23"
+      },
+      {
+       "icon": "mail",
+       "label": "Campaign",
+       "check_at": "entire#4+0.46"
+      }
+     ],
+     "size": 180,
+     "xs": [
+      210,
+      540,
+      870
+     ],
+     "y": 480,
+     "arrows": true,
+     "stagger": 0.12
+    },
+    {
+     "type": "title",
+     "text": "End to end",
+     "size": 96,
+     "y": 880,
+     "at": "end to end"
+    },
+    {
+     "type": "progress",
+     "y": 990,
+     "at": "end to end",
+     "dur": 0.6
+    },
+    {
+     "type": "tile",
+     "icon": "plug",
+     "size": 170,
+     "x": 220,
+     "y": 1260,
+     "at": "access#2"
+    },
+    {
+     "type": "title",
+     "text": "Access to",
+     "size": 72,
+     "x": 580,
+     "y": 1190,
+     "at": "access#2",
+     "anim": "slide"
+    },
+    {
+     "type": "title",
+     "text": "everything",
+     "size": 72,
+     "x": 600,
+     "y": 1275,
+     "at": "everything#2",
+     "anim": "slide"
+    },
+    {
+     "type": "title",
+     "text": "it needs",
+     "size": 72,
+     "color": "terra",
+     "x": 560,
+     "y": 1360,
+     "at": "needs",
+     "anim": "slide"
+    }
+   ]
+  },
+  {
+   "from": "If you want",
+   "layout": "split",
+   "say": "If you want the full setup guide on how you can get this running for yourself today",
+   "elements": [
+    {
+     "type": "card",
+     "title": "Full setup guide",
+     "sub": "get it running yourself",
+     "icon": "doc",
+     "w": 900,
+     "h": 200,
+     "y": 400,
+     "at": "setup guide"
+    },
+    {
+     "type": "title",
+     "text": "running today",
+     "size": 52,
+     "weight": 800,
+     "color": "green",
+     "y": 590,
+     "at": "today"
+    }
+   ]
+  },
+  {
+   "from": "comment",
+   "layout": "split",
+   "say": "comment Claude and I'll send it to your DMs for free",
+   "elements": [
+    {
+     "type": "comment_cta",
+     "keyword": "CLAUDE",
+     "y": 440,
+     "type_at": "Claude",
+     "dm_text": "Guide sent to your DMs",
+     "dm_at": "send"
+    }
+   ]
+  }
+ ],
+ "post": {
+  "title": "AI runs my cold outreach",
+  "caption": "Most people don't realize AI can run their entire cold outreach.\n\nDeepline plugs your AI agent into the whole go-to-market stack through one API. That covers data providers like Apollo and cold email infrastructure like Instantly, and it's usage-based pricing.\n\nSo you give your agent one prompt: find customers who match my ICP, check for recent buying signals, add them to an email campaign. It runs the whole thing end to end.\n\nComment CLAUDE and I'll send you the full setup guide for free.",
+  "dm": "",
+  "hashtags": [
+   "#coldoutreach",
+   "#aiagents",
+   "#gtm",
+   "#salesautomation",
+   "#aitools",
+   "#claude"
+  ],
+  "notes": []
+ },
+ "_about": "Example SPLIT-GRAPHIC beat sheet (a tool reel recorded as 5 short clips). Anchors are spoken words from that take."
+}

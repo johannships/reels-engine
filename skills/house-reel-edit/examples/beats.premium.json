@@ -1,0 +1,126 @@
+{
+ "format": "premium",
+ "keyword": "CLAUDE",
+ "caption_fixes": {
+  "DeepLine": "Deepline",
+  "a email": "an email"
+ },
+ "accents": {
+  "outreach": "red",
+  "deepline": "serif",
+  "faster": "red"
+ },
+ "sfx": [
+  {
+   "at": "AI",
+   "sfx": "sub"
+  },
+  {
+   "at": "It brings",
+   "sfx": "whoosh"
+  },
+  {
+   "at": "with this",
+   "sfx": "whoosh"
+  },
+  {
+   "at": "comment",
+   "sfx": "sub"
+  }
+ ],
+ "scenes": [
+  {
+   "from": 0,
+   "layout": "face",
+   "elements": [
+    {
+     "type": "behind_head",
+     "text": "AI",
+     "at": "AI",
+     "until": "entire+0.2"
+    }
+   ]
+  },
+  {
+   "from": "It brings",
+   "layout": "face",
+   "elements": [
+    {
+     "type": "glass_panel",
+     "title": "the stack",
+     "until": "with this",
+     "items": [
+      {
+       "label": "Data",
+       "sub": "providers",
+       "at": "stack",
+       "done": "together"
+      },
+      {
+       "label": "Email",
+       "sub": "infrastructure",
+       "at": "together",
+       "done": "one API"
+      },
+      {
+       "label": "One API",
+       "sub": "for your agent",
+       "at": "one API",
+       "done": "faster"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "from": "With this",
+   "layout": "split",
+   "elements": [
+    {
+     "type": "window",
+     "title": "your agent",
+     "illustrative": true,
+     "y": 470,
+     "h": 420,
+     "lines": [
+      {
+       "text": "Find customers who match my ICP",
+       "at": "find",
+       "until": "ICP.end"
+      },
+      {
+       "text": "Check for recent buying signals",
+       "at": "check",
+       "until": "signals.end"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "from": "and it could",
+   "layout": "face",
+   "transition": "whip",
+   "elements": []
+  },
+  {
+   "from": "comment",
+   "layout": "face",
+   "elements": [
+    {
+     "type": "end_card",
+     "keyword": "CLAUDE",
+     "line": "the setup guide, free in your DMs"
+    }
+   ]
+  }
+ ],
+ "post": {
+  "title": "",
+  "caption": "",
+  "dm": "",
+  "hashtags": [],
+  "notes": []
+ },
+ "_about": "Example PREMIUM TALKING-HEAD beat sheet: big type behind the head, a dark glass panel ticking on spoken words, a split for the illustrative UI demo, one whip, the end card."
+}
