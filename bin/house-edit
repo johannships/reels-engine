@@ -1,0 +1,3 @@
+#!/bin/sh
+# Repo-level shortcut for skills/house-reel-edit/bin/house-edit
+exec "$(dirname "$0")/../skills/house-reel-edit/bin/house-edit" "$@"
