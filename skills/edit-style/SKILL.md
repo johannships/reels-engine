@@ -2,7 +2,7 @@
 name: edit-style
 description: Turn a raw talking-head take into a dynamically-edited vertical reel — full-face / full-graphic / split layouts that switch per line, real UI and official-logo panels, captions on every word, voice + synthesised SFX (no music bed). The "looks like an editor made it" style, produced entirely from code, with hard QA gates (caption sync on the final render, A/V length, loudness, contact sheet, claims). Also covers how to WRITE the script so the voice doesn't read as AI. Point an agent at this, hand it a raw take or a topic, and it edits. Triggers on "edit this reel", "make it look edited", "add the dynamic layout / captions / graphics", "write a reel script".
 author: jars
-version: 1.2.0
+version: 1.2.1
 tags: [editing, reels, remotion, whisper, ffmpeg, captions, video, script]
 ---
 
@@ -126,6 +126,36 @@ because…"). Say the thing and stop. Real speech isn't stylised, it's direct.
 - **iPhone HDR (HLG / Dolby Vision) must be tone-mapped to SDR BT.709 first**,
   or it grades washed out. Check the fps survived: avconvert once turned a
   60 fps take into 18.75 fps.
+- **Use Apple's tone map, never hand-rolled HLG maths** (3 Oct 2026). Reel1 on
+  2 Oct used a numpy HLG curve (`gain 0.8`) and shipped overexposed and orange:
+  face median luma 148-167 vs Apple's 116, ~10% of pixels clipped, and it was
+  only caught after posting. Extract source frames with
+  `tools/hdr_to_sdr_frames.sh raw.mov need.txt src 1350 2400 60` (AVAssetReader
+  → BT.709, VFR-safe, all frames, drop-in for an ffmpeg `fps=60` extract).
+  Then put one face frame next to `avconvert -p Preset1920x1080` of the raw and look.
+- **Encode the final as tagged limited-range BT.709**, not the yuvj420p that
+  JPEG frames give by default:
+  `-vf "scale=in_range=pc:out_range=tv:in_color_matrix=bt601:out_color_matrix=bt709,format=yuv420p,setparams=range=tv:color_primaries=bt709:color_trc=bt709:colorspace=bt709" -color_range tv -color_primaries bt709 -color_trc bt709 -colorspace bt709 -c:v libx264 -profile:v high -preset slow -crf 17 -c:a aac -b:a 320k -ar 48000 -movflags +faststart`.
+  `tools/final_gates.sh` now fails anything else (or < 8 Mbps).
+- **Bitrate: never below 8 Mbps, aim for ~14.** CRF 17 usually lands there on
+  busy frames; when the gate reports less (flat graphics compress hard), swap
+  `-crf 17` for `-b:v 14M -maxrate 20M -bufsize 28M`. Platforms re-encode
+  anyway; a thin upload just gives them less to work with.
+- **DJI Pocket 3 "glamour" .mov is SDR but tagged FULL range** (5 Oct 2026).
+  It needs no tone map, but decode it as full range and output limited-range
+  BT.709, or faces render ~12 levels too dark with crushed blacks:
+  `zscale=rangein=full:range=limited` where zscale exists, otherwise
+  `-color_range pc` on the input plus
+  `scale=in_range=pc:out_range=tv:in_color_matrix=bt709:out_color_matrix=bt709`
+  (frame extracts: `scale=in_range=pc:out_range=pc` so the JPEGs keep the
+  real levels). Check the tag first:
+  `ffprobe -v error -select_streams v:0 -show_entries stream=color_range,color_transfer -of csv=p=0 raw.mov`
+  (`pc,bt709` = this case; `arib-std-b67` = iPhone HLG, use the Apple tool).
+- **Skin-luma gate for every raw take:** the final's face must sit within ~2
+  levels of the source at the same moment.
+  `tools/skin_luma_check.sh raw.mov <t_src> final.mp4 <t_final> <src_box> <final_box>`
+  (boxes are `x:y:w:h` on a patch of skin; it decodes each file with its own
+  range). A range mistake shows up as ~10+ levels.
 - **Keep the last take** of any repeated line. Cut dead air and false starts.
   Never cut mid-word.
 - **Cut private third-party detail** he says in passing (a friend's employer,
@@ -180,6 +210,15 @@ show the Claude logo, for pattern recognition."
 
 ## Pipeline order
 
+0. **One folder per reel, everything inside it.** Each edit (and each
+   parallel editor agent) keeps ALL its work files (frames, panels, audio,
+   renders, logs) inside its own reel folder. Never use a shared `_work`
+   dir: a parallel run wiped another reel's shared work folder on 5 Oct 2026.
+   **Adapting a source reel?** Pull its keyframes (a contact sheet every
+   ~0.5s) and use them as the layout and timing reference: which layout
+   when, how long each beat holds, where the text sits. Rebuild it with your
+   own real assets (your take, live screenshots, official logos). Never
+   reuse its footage or graphics.
 1. **Prep** the take (HDR → SDR, fps check) and **tighten** it (Part 2).
 2. **Transcribe** the tightened audio with Whisper.
 3. **Author the shot plan** — `(panel_kind, layout, anchor_phrase, content)`.
@@ -292,12 +331,20 @@ Raw-voice videos ship **voice + synthesised SFX only**. No music bed.
 5. **Contact sheet** — 12 evenly spaced frames in one image. **Open it and
    look at it** before saying done. Fail on: any pill, badge or sticker,
    captions over the face, a wrong or distorted logo, private data, graphics
-   cut by the safe zones or the 4:5 feed crop.
+   cut by the safe zones or the 4:5 feed crop. Every label and card must sit
+   inside the 4:5 centre crop (1080x1350, y 285-1635), not just the captions.
 6. **CLAIMS** — no number on screen without a source file you can name
    (path + date). Measured ranges beat spoken roundings ("67–86 sec", not
    "about a minute"). Anything he says on camera that the source doesn't support
    stays off screen and is listed under CLAIMS in `QA.md` for the owner to decide.
+   **Verify every on-screen number live** (API or the live page, the day of
+   render) and note the capture time; a number from memory or an old note is
+   not a source. **A spoken line that is factually false gets cut** from the
+   edit, not captioned, and is flagged under CLAIMS with what the source says.
 7. **First word survives** — re-whisper the first 2s after any head trim.
+8. **Colour** — `final_gates.sh` checks tags and bitrate (yuv420p, tv range,
+   BT.709, >= 8 Mbps); `tools/skin_luma_check.sh` checks the face is within
+   ~2 levels of the source (Part 2).
 
 Deliverables: `final.mp4`, `contact.png`, `captions.srt` (re-whisper of the
 final, spellings fixed), `QA.md`, and a `LOG.md` written as you go (agents
@@ -405,3 +452,18 @@ owner reads them as AI slop. Real Vox / Johnny Harris short-form is:
 - One accent colour. Serif-italic OR bold-sans captions, not both at once.
 - Show, don't narrate: when the voice names a thing, that thing is on screen.
 - Use **official logos** where a brand is named (hook rule above).
+
+---
+
+## Changelog
+
+- **1.2.1 (5 Oct 2026)** — DJI Pocket 3 full-range decode + skin-luma gate
+  (`tools/skin_luma_check.sh`); bitrate floor 8 Mbps, aim ~14; one folder per
+  reel, no shared `_work` dir for parallel edits; labels and cards inside the
+  4:5 crop; adapting a source reel = its keyframes as layout/timing reference
+  with your own real assets; verify every on-screen number live; cut and flag
+  factually false lines.
+- **1.2.0 (2-3 Oct 2026)** — official brand logo in the hook; caption sync
+  gated per chapter on the final render; Apple HDR tone map
+  (`tools/hdr_to_sdr_frames.sh`) and the colour/encode gate in
+  `tools/final_gates.sh`.
