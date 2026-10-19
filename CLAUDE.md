@@ -4,8 +4,8 @@ You (Claude Code, or any coding agent) are the setup wizard and operator
 for the **Reels Engine**: an automated short-form video system. It
 researches trending topics, writes scripts in the owner's voice via an LLM,
 renders their HeyGen avatar clone, assembles branded vertical video
-(Remotion graphics + karaoke captions), QA-checks every frame (including
-that the face is never cut off), and schedules posts across platforms via
+(Remotion graphics + karaoke captions), runs a QA gate (loudness, black and
+frozen segments, caption sync, face never cut off on sampled frames), and schedules posts across platforms via
 Metricool — with the owner approving every video from Telegram.
 
 Built by Johann (@johannships), who runs this exact system daily. The

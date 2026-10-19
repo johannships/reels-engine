@@ -78,8 +78,8 @@ credits ([full breakdown](https://www.youtube.com/watch?v=kksHFCkX-Mk)).
 Automated short-form pipeline:
 trend research (GitHub / Hacker News / RSS) → LLM-written scripts in YOUR
 voice → HeyGen avatar clone → Remotion graphics + karaoke captions → a QA
-gate that checks every frame (face position, audio loudness, black frames,
-caption accuracy) → scheduled to every platform via Metricool. Plus a
+gate (face position on sampled frames, audio loudness, black and frozen
+segments, caption accuracy and sync) → scheduled to every platform via Metricool. Plus a
 2-hourly breakout watcher for big trends and a metrics-driven style memo
 that makes every script better than the last. You approve each video with
 one tap in Telegram. Nothing posts itself.
